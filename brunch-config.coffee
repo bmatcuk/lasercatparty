@@ -1,0 +1,27 @@
+exports.config =
+  files:
+    javascripts:
+      joinTo:
+        'javascripts/app.js': /^app[\\/]/
+        'javascripts/vendor.js': /^(vendor|bower_components)[\\/]/
+
+    stylesheets:
+      joinTo:
+        'stylesheets/app.css': /^(app|vendor)[\\/]/
+
+    templates:
+      joinTo: 'javascripts/app.js'
+
+  conventions:
+    assets: /(assets|vendor\/assets|font)/
+    ignored: /jade[\\/]runtime.js$/
+
+  plugins:
+    jaded:
+      staticPatterns: /^app[\\/]static[\\/](.+)\.jade$/
+    postcss:
+      processors: [
+        require('autoprefixer')(['> 5%'])
+        require('postcss-nested')
+      ]
+

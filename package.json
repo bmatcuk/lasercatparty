@@ -1,0 +1,28 @@
+{
+  "author": "Bob Matcuk",
+  "name": "lasercat.party",
+  "description": "pew, pew!",
+  "version": "0.0.1",
+  "private": true,
+  "homepage": "http://lasercat.party",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bmatcuk/lasercatparty.git"
+  },
+  "scripts": {
+    "start": "brunch watch --server",
+    "test": "brunch test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "autoprefixer": "^5.1.1",
+    "brunch": "^1.8.2",
+    "clean-css-brunch": "^1.7.2",
+    "coffee-script-brunch": "^1.8.1",
+    "jaded-brunch": "^1.7.13",
+    "javascript-brunch": "^1.7.1",
+    "postcss-brunch": "^0.3.1",
+    "postcss-nested": "^0.3.1",
+    "uglify-js-brunch": "^1.7.8"
+  }
+}
