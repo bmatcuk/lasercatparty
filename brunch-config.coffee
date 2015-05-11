@@ -4,6 +4,8 @@ exports.config =
       joinTo:
         'javascripts/app.js': /^app[\\/]/
         'javascripts/vendor.js': /^(vendor|bower_components)[\\/]/
+      order:
+        after: /^app[\\/]scripts[\\/]main\./
 
     stylesheets:
       joinTo:
