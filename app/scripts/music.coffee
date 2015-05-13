@@ -28,17 +28,27 @@ module.exports =
   load: (url) ->
     new Promise (resolve, reject) ->
       url = DEFAULT_MUSIC unless url?
-      SC.get 'https://api.soundcloud.com/resolve', {url: url}, (track, err) ->
+      SC.get '/resolve', {url: url}, (track, err) ->
         if err?
           reject err
           return
 
-        currentTrack = -1
-        if track.tracks?
-          tracks = track.tracks
-        else
-          tracks = [track]
-        do loadNextTrack
+        # we need to grab the actual streaming url using this hidden API endpoint
+        promises = for t in (if track.tracks? then track.tracks else [track])
+          do (t) ->
+            new Promise (resolve, reject) ->
+              SC.get "/i1/tracks/#{t.id}/streams/", (streams) ->
+                console.log t.stream_url
+                console.log streams.http_mp3_128_url
+                if streams.http_mp3_128_url?
+                  t.stream_url = streams.http_mp3_128_url
+                  resolve t
+
+        Promise.all(promises).then (streams) ->
+          currentTrack = -1
+          tracks = streams.filter (t) -> t.stream_url?
+          do loadNextTrack
+          do resolve
 
   play: audio.play
 
