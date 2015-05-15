@@ -7,9 +7,14 @@ SC.initialize client_id: clientId
 
 context = new (window.AudioContext || window.webkitAudioContext)()
 audio = new Audio()
+audio.mozAudioChannelType = "content"
+audio.preload = "auto"
+audio.type = "audio/mpeg"
 audio.crossOrigin = "anonymous"
 audio.loop = false
-audio.addEventListener 'ended', loadNextTrack
+audio.addEventListener 'abort', (e) -> console.log e
+audio.addEventListener 'error', (e) -> console.log e
+window.test = audio
 
 media = context.createMediaElementSource audio
 media.connect context.destination
@@ -17,11 +22,17 @@ media.connect context.destination
 tracks = null
 currentTrack = -1
 loadNextTrack = ->
+  console.log 'Loading next track'
+  audio.removeEventListener 'ended', loadNextTrack
   return unless tracks?
   currentTrack++
   currentTrack = 0 if currentTrack >= tracks.length
-  audio.src = "#{tracks[currentTrack].stream_url}?client_id=#{clientId}"
+  audio.src = "#{tracks[currentTrack].stream_url}"
+  audio.addEventListener 'canplay', playCurrentTrack
   do audio.load
+playCurrentTrack = ->
+  console.log 'Playing current track...'
+  audio.removeEventListener 'canplay', playCurrentTrack
   do audio.play
 
 module.exports =
@@ -37,7 +48,7 @@ module.exports =
         promises = for t in (if track.tracks? then track.tracks else [track])
           do (t) ->
             new Promise (resolve, reject) ->
-              SC.get "/i1/tracks/#{t.id}/streams/", (streams) ->
+              SC.get "/i1/tracks/#{t.id}/streams", (streams) ->
                 console.log t.stream_url
                 console.log streams.http_mp3_128_url
                 if streams.http_mp3_128_url?
