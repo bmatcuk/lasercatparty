@@ -1,0 +1,7 @@
+body {
+  background-color: var(--background);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+

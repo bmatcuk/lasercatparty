@@ -10,6 +10,8 @@ exports.config =
     stylesheets:
       joinTo:
         'stylesheets/app.css': /^(app|vendor)[\\/]/
+      order:
+        before: /^app[\\/]stylesheets[\\/]_/
 
     templates:
       joinTo: 'javascripts/app.js'
@@ -23,7 +25,7 @@ exports.config =
       staticPatterns: /^app[\\/]static[\\/](.+)\.jade$/
     postcss:
       processors: [
-        require('autoprefixer')(['> 5%'])
         require('postcss-nested')
+        require('cssnext')({browsers: '> 5%'})
       ]
 

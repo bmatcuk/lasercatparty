@@ -15,7 +15,6 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "autoprefixer": "^5.1.1",
     "brunch": "^1.8.2",
     "clean-css-brunch": "^1.7.2",
     "coffee-script-brunch": "^1.8.1",
@@ -23,6 +22,8 @@
     "javascript-brunch": "^1.7.1",
     "postcss-brunch": "^0.3.1",
     "postcss-nested": "^0.3.1",
-    "uglify-js-brunch": "^1.7.8"
+    "uglify-js-brunch": "^1.7.8",
+    "cssnext": "~1.4.0",
+    "css-brunch": "~1.7.0"
   }
 }

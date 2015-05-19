@@ -12,3 +12,14 @@ BACKGROUNDS = [
   {image: "http://imgsrc.hubblesite.org/hu/db/images/hs-2006-10-a-xlarge_web.jpg", name: "Spiral Galaxy M101", link: "http://hubblesite.org/gallery/album/galaxy/pr2006010a/"}
 ]
 
+module.exports =
+  loadRandom: ->
+    new Promise (resolve, reject) ->
+      idx = Math.floor(Math.random() * BACKGROUNDS.length)
+      onload = ->
+        this.removeEventHandler 'load', onload
+        do resolve BACKGROUNDS[idx]
+      image = new Image()
+      image.addEventHandler 'load', onload
+      image.src = BACKGROUNDS[idx].image
+
