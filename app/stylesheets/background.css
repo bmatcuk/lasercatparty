@@ -1,7 +1,13 @@
-body {
-  background-color: var(--background);
+section.background {
+  z-index: var(--background-z-index);
+  background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-  background-repeat: no-repeat;
+  animation: fadein 1s;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  top: 0;
 }
 

@@ -1,8 +1,10 @@
 "use strict"
 
-music = require 'scripts/music'
+#music = require 'scripts/music'
+background = require 'scripts/background'
 
 module.exports =
   unleashTheUnicorns: ->
-    music.load().then -> do music.play
+    #music.load().then -> do music.play
+    do background.loadRandom
 
