@@ -27,12 +27,12 @@ loadNextTrack = ->
   return unless tracks?
   currentTrack++
   currentTrack = 0 if currentTrack >= tracks.length
-  audio.src = "#{tracks[currentTrack].stream_url}"
   audio.addEventListener 'canplay', playCurrentTrack
-  do audio.load
+  audio.src = "http://crossorigin.me/#{tracks[currentTrack].stream_url}"
 playCurrentTrack = ->
   console.log 'Playing current track...'
   audio.removeEventListener 'canplay', playCurrentTrack
+  audio.addEventListener 'ended', loadNextTrack
   do audio.play
 
 module.exports =
@@ -49,8 +49,6 @@ module.exports =
           do (t) ->
             new Promise (resolve, reject) ->
               SC.get "/i1/tracks/#{t.id}/streams", (streams) ->
-                console.log t.stream_url
-                console.log streams.http_mp3_128_url
                 if streams.http_mp3_128_url?
                   t.stream_url = streams.http_mp3_128_url
                   resolve t
