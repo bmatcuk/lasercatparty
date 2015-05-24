@@ -22,21 +22,25 @@ media.connect context.destination
 tracks = null
 currentTrack = -1
 loadNextTrack = ->
-  console.log 'Loading next track'
+  # increment currentTrack
   audio.removeEventListener 'ended', loadNextTrack
   return unless tracks?
   currentTrack++
   currentTrack = 0 if currentTrack >= tracks.length
+
+  # Setting the src should automatically cause a "load" and, eventually, a
+  # canplay event. Soundcloud doesn't set their CORS headers for all their
+  # tracks for some reason, so we proxy through crossorigin.me.
   audio.addEventListener 'canplay', playCurrentTrack
   audio.src = "http://crossorigin.me/#{tracks[currentTrack].stream_url}"
+
 playCurrentTrack = ->
-  console.log 'Playing current track...'
   audio.removeEventListener 'canplay', playCurrentTrack
   audio.addEventListener 'ended', loadNextTrack
   do audio.play
 
 module.exports =
-  load: (url) ->
+  loadRandom: (url) ->
     new Promise (resolve, reject) ->
       url = DEFAULT_MUSIC unless url?
       SC.get '/resolve', {url: url}, (track, err) ->

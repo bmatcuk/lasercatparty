@@ -5,6 +5,6 @@ background = require 'scripts/background'
 
 module.exports =
   unleashTheUnicorns: ->
-    music.load().then -> do music.play
+    music.loadRandom()
     do background.loadRandom
 
