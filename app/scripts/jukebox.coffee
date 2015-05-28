@@ -1,26 +1,40 @@
 "use strict"
 
 DEFAULT_MUSIC = "https://soundcloud.com/hailtiki/sets/lasercat-party"
+BEAT_IGNORE = 500
 
 clientId = require('scripts/apis').soundcloud
 SC.initialize client_id: clientId
 
-reqAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || (callback) -> setTimeout(callback, 1000 / 60)
+reqAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame
 
 class AnalysisMachine
   constructor: (@jukebox) ->
     @freqData = new Uint8Array @jukebox.analyser.frequencyBinCount
     @timeData = new Uint8Array @jukebox.analyser.fftSize
     @running = true
+    @smoothedLevel = 0
+    @beatCutOff = 0
+    @nextBeatTime = 0
     do @analysis
 
-  analysis: ->
-    @jukebox.analyser.getByteFrequencyData @freqData
-    @jukebox.analyser.getByteTimeDomainData @timeData
-    peak = Math.max.apply null, @timeData
-    @jukebox.analysisDelegate @freqData, @timeData, peak
+  analysis: (timestamp) ->
     if @running
-      reqAnimationFrame => do @analysis
+      @jukebox.analyser.getByteFrequencyData @freqData
+      @jukebox.analyser.getByteTimeDomainData @timeData
+      level = Math.avg.apply null, @freqData
+      beat = false
+      if timestamp >= @nextBeatTime
+        if level > @beatCutOff
+          beat = true
+          @beatCutOff = level
+          @nextBeatTime = timestamp + BEAT_IGNORE
+        else
+          @beatCutOff *= 0.98
+
+      @smoothedLevel += (level - @smoothedLevel) * 0.02
+      @jukebox.analysisDelegate @freqData, @timeData, @smoothedLevel, beat
+      reqAnimationFrame (timestamp) => @analysis timestamp
 
   stop: -> @running = false
 
@@ -44,15 +58,15 @@ class Jukebox
     @audio.addEventListener 'error', =>
       do @stopAnalysis
       @tracks.splice @currentTrack, 1
-      do @errorDelegate
+      @errorDelegate @audio.error
       do @playRandom
 
     @context = new (window.AudioContext || window.webkitAudioContext || window.mozAudioContext)()
-    @analyser = context.createAnalyser()
+    @analyser = @context.createAnalyser()
     @analyser.fftSize = 1024
     @analyser.connect @context.destination
 
-    @media = context.createMediaElementSource @audio
+    @media = @context.createMediaElementSource @audio
     @media.connect @analyser
 
   load: ->
@@ -66,7 +80,7 @@ class Jukebox
         promises = for t in (if track.tracks? then track.tracks else [track])
           do (t) ->
             new Promise (resolve, _) ->
-              SC.get "/i1/tracks/#{t.id}/stream", (streams, err) ->
+              SC.get "/i1/tracks/#{t.id}/streams", (streams, err) ->
                 if err?
                   resolve null
                 else if streams.http_mp3_128_url
@@ -93,10 +107,9 @@ class Jukebox
       do @machine.stop
       @machine = null
 
-  analysisDelegate: -> return
+  analysisDelegate: (freqData, timeData, level, beat) -> return
 
-  errorDelegate: -> return
+  errorDelegate: (err) -> return
 
-module.exports =
-  jukebox: Jukebox
+module.exports = Jukebox
 
