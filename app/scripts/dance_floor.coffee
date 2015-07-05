@@ -2,9 +2,10 @@
 
 class DanceFloor
   constructor: (scene) ->
-    @geometry = new THREE.PlaneGeometry 2000, 2000, 10, 10
+    @geometry = new THREE.PlaneBufferGeometry 2000, 2000, 10, 10
     @material = new THREE.MeshBasicMaterial color: 0xffff00, side: THREE.FrontSide
     @plane = new THREE.Mesh @geometry, @material
+    @plane.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / -2.0)
     @plane.visible = false
     scene.add @plane
 
