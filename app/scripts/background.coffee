@@ -12,17 +12,6 @@ BACKGROUNDS = [
   {image: "http://imgsrc.hubblesite.org/hu/db/images/hs-2006-10-a-xlarge_web.jpg", name: "Spiral Galaxy M101", link: "http://hubblesite.org/gallery/album/galaxy/pr2006010a/"}
 ]
 
-createBackground = (background) ->
-  existingBackgrounds = document.querySelectorAll 'section.background'
-  if existingBackgrounds.length
-    removeExistingBackground = -> Array.prototype.forEach existingBackgrounds, (b) -> b.parentNode.removeChild b
-    setTimeout(removeExistingBackground, 2000)
-
-  bg = document.createElement 'SECTION'
-  bg.style.backgroundImage = "url(#{background.image})"
-  bg.classList.add 'background'
-  document.body.appendChild bg
-
 module.exports =
   loadRandom: ->
     new Promise (resolve, reject) ->
@@ -31,7 +20,6 @@ module.exports =
 
       onload = ->
         this.removeEventListener 'load', onload
-        createBackground background
         resolve background
 
       image = new Image()
