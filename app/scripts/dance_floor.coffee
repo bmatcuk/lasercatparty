@@ -1,7 +1,7 @@
 "use strict"
 
 class DanceFloor
-  constructor: (scene) ->
+  constructor: ->
     @uniforms =
       progress:
         type: 'f'
@@ -22,6 +22,8 @@ class DanceFloor
     @plane = new THREE.Mesh @geometry, @material
     @plane.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / -2.0)
     @plane.visible = false
+
+  setScene: (scene) ->
     scene.add @plane
 
   show: (timestamp) ->
