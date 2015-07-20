@@ -1,5 +1,7 @@
 "use strict"
 
+LOOKAT = new THREE.Vector3 0, 250, 0
+
 class Scene
   constructor: (parent) ->
     @paused = true
@@ -55,6 +57,8 @@ class Scene
         @orthoCamera.top = 1.0 / aspect
         @orthoCamera.bottom = -1.0 / aspect
       do @orthoCamera.updateProjectionMatrix
+      obj.resize?(@orthoCamera.right, @orthoCamera.top) for obj in @backgroundObjs
+      obj.resize?(@orthoCamera.right, @orthoCamera.top) for obj in @midStationaryObjs
 
       # perspective camera
       @perspectiveCamera.aspect = aspect
@@ -73,6 +77,7 @@ class Scene
 
   addMidStationaryObj: (obj) ->
     @midStationaryObjs.push obj
+    obj.resize? @orthoCamera.right, @orthoCamera.top
     obj.setScene @midStationary
 
   addFrontPerspectiveObj: (obj) ->
@@ -85,16 +90,17 @@ class Scene
       requestAnimationFrame render
 
       # rotate the camera
-      t = timestamp * 0.000005
+      t = timestamp * 0.00005
       @perspectiveCamera.position.x = Math.sin(t) * 1000
       @perspectiveCamera.position.z = Math.cos(t) * 1000
-      @perspectiveCamera.lookAt @backPerspective.position
+      @perspectiveCamera.lookAt LOOKAT
+      #@perspectiveCamera.lookAt @backPerspective.position
 
       # update
-      obj.update(timestamp) for obj in @backgroundObjs
-      obj.update(timestamp) for obj in @backPerspectiveObjs
-      obj.update(timestamp) for obj in @midStationaryObjs
-      obj.update(timestamp) for obj in @frontPerspectiveObjs
+      obj.update?(timestamp) for obj in @backgroundObjs
+      obj.update?(timestamp) for obj in @backPerspectiveObjs
+      obj.update?(timestamp) for obj in @midStationaryObjs
+      obj.update?(timestamp) for obj in @frontPerspectiveObjs
 
       # render
       do @renderer.clear
