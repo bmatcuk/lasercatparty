@@ -5,6 +5,8 @@ scene = require 'scripts/scene'
 background = require 'scripts/background'
 DanceFloor = require 'scripts/dance_floor'
 backgroundcat = require 'scripts/backgroundcat'
+leftpaw = require 'scripts/leftpaw'
+rightpaw = require 'scripts/rightpaw'
 
 begin = ->
   # do background.loadRandom
@@ -13,13 +15,21 @@ begin = ->
     scene.init document.getElementById 'container'
     do background.loadRandom
     do backgroundcat.init
+    do leftpaw.init
+    do rightpaw.init
   ]
   init.then (things) ->
-    [jukebox, scene, background, backgroundcat] = things
+    [jukebox, scene, background, backgroundcat, leftpaw, rightpaw] = things
+
+    # add paws to background cat
+    backgroundcat.addLeftPaw leftpaw
+    backgroundcat.addRightPaw rightpaw
 
     # add objs to scene
     scene.addBackgroundObj background
-    scene.addMidStationaryObj backgroundcat
+    scene.addBackgroundObj backgroundcat
+    scene.addMidStationaryObj leftpaw
+    scene.addMidStationaryObj rightpaw
 
     danceFloor = new DanceFloor
     danceFloor.show window.performance.now() #TODO: remove

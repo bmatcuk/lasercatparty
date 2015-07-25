@@ -21,6 +21,7 @@ class Background
     @geometry = new THREE.PlaneBufferGeometry width, height
     @material = new THREE.MeshBasicMaterial map: @texture
     @plane = new THREE.Mesh @geometry, @material
+    @plane.position.z = -0.9
 
   setScene: (scene) ->
     scene.add @plane

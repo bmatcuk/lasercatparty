@@ -1,6 +1,7 @@
 "use strict"
 
-LOOKAT = new THREE.Vector3 0, 250, 0
+CAMERA_Y = 250
+LOOKAT = new THREE.Vector3 0, CAMERA_Y, 0
 
 class Scene
   constructor: (parent) ->
@@ -30,7 +31,7 @@ class Scene
 
     # perspective camera
     @perspectiveCamera = new THREE.PerspectiveCamera 75, aspect, 0.1, 2000
-    @perspectiveCamera.position.y = 250
+    @perspectiveCamera.position.y = CAMERA_Y
     @perspectiveCamera.position.z = 1000
 
     # renderer
@@ -69,6 +70,7 @@ class Scene
 
   addBackgroundObj: (obj) ->
     @backgroundObjs.push obj
+    obj.resize? @orthoCamera.right, @orthoCamera.top
     obj.setScene @background
 
   addBackPerspectiveObj: (obj) ->

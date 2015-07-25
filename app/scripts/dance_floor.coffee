@@ -13,7 +13,7 @@ class DanceFloor
         type: 'i'
         value: 0
 
-    @geometry = new THREE.PlaneBufferGeometry 2000, 2000, 1, 1
+    @geometry = new THREE.PlaneBufferGeometry 1200, 1200, 1, 1
     @material = new THREE.ShaderMaterial
       uniforms: @uniforms
       vertexShader: require 'shaders/dance_floor_vert'
