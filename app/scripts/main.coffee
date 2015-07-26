@@ -7,6 +7,11 @@ DanceFloor = require 'scripts/dance_floor'
 backgroundcat = require 'scripts/backgroundcat'
 leftpaw = require 'scripts/leftpaw'
 rightpaw = require 'scripts/rightpaw'
+invisiblebike = require 'scripts/invisiblebike'
+muffincat = require 'scripts/muffincat'
+
+rnd = (min, max) ->
+  Math.random() * (max - min) + min
 
 begin = ->
   # do background.loadRandom
@@ -17,23 +22,34 @@ begin = ->
     do backgroundcat.init
     do leftpaw.init
     do rightpaw.init
+    do invisiblebike.init
+    do muffincat.init
   ]
   init.then (things) ->
-    [jukebox, scene, background, backgroundcat, leftpaw, rightpaw] = things
+    [jukebox, scene, background, backgroundcat, leftpaw, rightpaw, invisiblebike, muffincat] = things
 
     # add paws to background cat
     backgroundcat.addLeftPaw leftpaw
     backgroundcat.addRightPaw rightpaw
 
-    # add objs to scene
+    # add background and background cat to scene
     scene.addBackgroundObj background
     scene.addBackgroundObj backgroundcat
     scene.addMidStationaryObj leftpaw
     scene.addMidStationaryObj rightpaw
 
+    # dance floor
     danceFloor = new DanceFloor
     danceFloor.show window.performance.now() #TODO: remove
     scene.addBackPerspectiveObj danceFloor
+
+    # dancers
+    for i in [0..5]
+      bike = invisiblebike rnd(-500, 500), rnd(-500, 500)
+      scene.addFrontPerspectiveObj bike
+    for i in [0..5]
+      muffin = muffincat rnd(-500, 500), rnd(-500, 500)
+      scene.addFrontPerspectiveObj muffin
 
     # start rendering
     do scene.start
