@@ -26,6 +26,29 @@ class Background
   setScene: (scene) ->
     scene.add @plane
 
+class BackgroundReflection
+  constructor: (@texture) ->
+    # calculate width and height
+    aspect = @texture.image.width / @texture.image.height
+    [width, height] = if aspect > 1.0 then [2.0 * aspect, 2.0] else [2.0, 2.0 / aspect]
+
+    @geometry = new THREE.PlaneBufferGeometry width, height
+    @material = new THREE.MeshBasicMaterial map: @texture, color: 0xff808080
+    @plane = new THREE.Mesh @geometry, @material
+    @plane.position.z = -0.8
+
+  setScene: (scene) ->
+    scene.add @plane
+
+  resize: (left, top) ->
+    factor = 2.0 / 5.0
+    @plane.position.y = 2.0 * top * factor - top - @geometry.parameters.height / 2.0
+
+    uvFactor = (@geometry.parameters.height / 2.0 - top + 2.0 * top * factor) / @geometry.parameters.height
+    uvs = @geometry.getAttribute 'uv'
+    uvs.set [0, uvFactor, 1.0, uvFactor, -0.4, 0.5 + uvFactor, 1.4, 0.5 + uvFactor]
+    uvs.needsUpdate = true
+
 module.exports =
   loadRandom: ->
     new Promise (resolve, reject) ->
@@ -35,5 +58,6 @@ module.exports =
         texture.minFilter = THREE.NearestFilter
 
         background = new Background texture
-        resolve background
+        reflection = new BackgroundReflection texture
+        resolve [background, reflection]
 

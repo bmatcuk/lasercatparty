@@ -26,7 +26,8 @@ begin = ->
     do muffincat.init
   ]
   init.then (things) ->
-    [jukebox, scene, background, backgroundcat, leftpaw, rightpaw, invisiblebike, muffincat] = things
+    [jukebox, scene, backgrounds, backgroundcat, leftpaw, rightpaw, invisiblebike, muffincat] = things
+    [background, backgroundReflection] = backgrounds
 
     # add paws to background cat
     backgroundcat.addLeftPaw leftpaw
@@ -34,6 +35,7 @@ begin = ->
 
     # add background and background cat to scene
     scene.addBackgroundObj background
+    scene.addBackgroundObj backgroundReflection
     scene.addBackgroundObj backgroundcat
     scene.addMidStationaryObj leftpaw
     scene.addMidStationaryObj rightpaw
@@ -45,10 +47,10 @@ begin = ->
 
     # dancers
     for i in [0..5]
-      bike = invisiblebike rnd(-500, 500), rnd(-500, 500)
+      bike = invisiblebike rnd(-400, 400), rnd(-400, 400)
       scene.addFrontPerspectiveObj bike
     for i in [0..5]
-      muffin = muffincat rnd(-500, 500), rnd(-500, 500)
+      muffin = muffincat rnd(-400, 400), rnd(-400, 400)
       scene.addFrontPerspectiveObj muffin
 
     # start rendering
