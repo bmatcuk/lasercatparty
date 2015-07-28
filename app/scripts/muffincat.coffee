@@ -12,6 +12,14 @@ class MuffinCat
   setScene: (scene) ->
     scene.add @sprite
 
+  update: (timestamp) ->
+    if @nextUpdate?
+      if @nextUpdate < timestamp
+        @sprite.scale.x = 0 - @sprite.scale.x
+        @nextUpdate = timestamp + Math.random() * 1000
+    else
+      @nextUpdate = timestamp + Math.random() * 1000
+
 module.exports =
   init: ->
     new Promise (resolve, reject) ->
