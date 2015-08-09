@@ -4,6 +4,7 @@ jukebox = require 'scripts/jukebox'
 scene = require 'scripts/scene'
 background = require 'scripts/background'
 DanceFloor = require 'scripts/dance_floor'
+SpectrumAnalyzer = require 'scripts/spectrum'
 backgroundcat = require 'scripts/backgroundcat'
 leftpaw = require 'scripts/leftpaw'
 rightpaw = require 'scripts/rightpaw'
@@ -34,6 +35,7 @@ begin = ->
 
     # add background and background cat to scene
     scene.addBackgroundObj background
+    scene.addBackgroundObj new SpectrumAnalyzer
     scene.addBackgroundObj backgroundcat
     scene.addMidStationaryObj leftpaw
     scene.addMidStationaryObj rightpaw
