@@ -26,8 +26,7 @@ begin = ->
     do muffincat.init
   ]
   init.then (things) ->
-    [jukebox, scene, backgrounds, backgroundcat, leftpaw, rightpaw, invisiblebike, muffincat] = things
-    [background, backgroundReflection] = backgrounds
+    [jukebox, scene, background, backgroundcat, leftpaw, rightpaw, invisiblebike, muffincat] = things
 
     # add paws to background cat
     backgroundcat.addLeftPaw leftpaw
@@ -35,7 +34,6 @@ begin = ->
 
     # add background and background cat to scene
     scene.addBackgroundObj background
-    scene.addBackgroundObj backgroundReflection
     scene.addBackgroundObj backgroundcat
     scene.addMidStationaryObj leftpaw
     scene.addMidStationaryObj rightpaw

@@ -30,10 +30,50 @@ class BackgroundReflection
   constructor: (@texture) ->
     # calculate width and height
     aspect = @texture.image.width / @texture.image.height
-    [width, height] = if aspect > 1.0 then [2.0 * aspect, 2.0] else [2.0, 2.0 / aspect]
+    [halfwidth, halfheight] = if aspect > 1.0 then [1.0 * aspect, 1.0] else [1.0, 1.0 / aspect]
+    narrow = 0.2
 
-    @geometry = new THREE.PlaneBufferGeometry width, height
-    @material = new THREE.MeshBasicMaterial map: @texture, color: 0xff808080
+    vertices = new Float32Array [
+      -halfwidth, halfheight, 0.0
+      halfwidth, halfheight, 0.0
+      -narrow * halfwidth, -halfheight * 0.5, 0.0
+      narrow * halfwidth, -halfheight * 0.5, 0.0
+    ]
+    indexes = new Uint16Array [0, 2, 1, 2, 3, 1]
+    uvs = new Float32Array [
+      0, 0, 1
+      1, 0, 1
+      0, narrow, narrow
+      narrow, narrow, narrow
+    ]
+
+    @geometry = new THREE.BufferGeometry
+    @geometry.addAttribute 'position', new THREE.BufferAttribute vertices, 3
+    @geometry.addAttribute 'index', new THREE.BufferAttribute indexes, 1
+    @geometry.addAttribute 'uvs', new THREE.BufferAttribute uvs, 3
+    @geometry.parameters =
+      width: 2.0 * halfwidth
+      height: 2.0 * halfheight
+
+    @uniforms =
+      background:
+        type: 't'
+        value: @texture
+      backgroundOffset:
+        type: 'f'
+        value: 0.0
+      shading:
+        type: 'c'
+        value: new THREE.Color 0xff808080
+
+    @material = new THREE.ShaderMaterial
+      uniforms: @uniforms
+      attributes:
+        uvs:
+          type: 'v3'
+      vertexShader: require 'shaders/background_reflection_vert'
+      fragmentShader: require 'shaders/background_reflection_frag'
+
     @plane = new THREE.Mesh @geometry, @material
     @plane.position.z = -0.8
 
@@ -43,11 +83,7 @@ class BackgroundReflection
   resize: (left, top) ->
     factor = 2.0 / 5.0
     @plane.position.y = 2.0 * top * factor - top - @geometry.parameters.height / 2.0
-
-    uvFactor = (@geometry.parameters.height / 2.0 - top + 2.0 * top * factor) / @geometry.parameters.height
-    uvs = @geometry.getAttribute 'uv'
-    uvs.set [0, uvFactor, 1.0, uvFactor, -0.4, 0.5 + uvFactor, 1.4, 0.5 + uvFactor]
-    uvs.needsUpdate = true
+    @uniforms.backgroundOffset.value = (@geometry.parameters.height / 2.0 - top + 2.0 * top * factor) / @geometry.parameters.height
 
 module.exports =
   loadRandom: ->
@@ -58,6 +94,6 @@ module.exports =
         texture.minFilter = THREE.NearestFilter
 
         background = new Background texture
-        reflection = new BackgroundReflection texture
-        resolve [background, reflection]
+        #reflection = new BackgroundReflection texture
+        resolve background
 
