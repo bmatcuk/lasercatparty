@@ -31,8 +31,5 @@ class Jukebox
         do resolve
       @dancer.audio.addEventListener 'ended', onended
 
-module.exports =
-  init: ->
-    Promise.resolve new Jukebox
-
+module.exports = Jukebox
 

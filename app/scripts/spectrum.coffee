@@ -3,14 +3,20 @@
 TOTAL_BAR_ANGLE = 180.0 / 7.0 * Math.PI / 180.0
 BAR_ANGLE = TOTAL_BAR_ANGLE / 2.0
 LENGTH_START = 0.2
-LENGTH_END = 0.8
+LENGTH_END = 0.9
 
 class SpectrumBar
   constructor: (@geometry, angle) ->
     @uniforms =
       power:
         type: 'f'
-        value: 0.5
+        value: 1.0
+      color:
+        type: 'v3'
+        value: new THREE.Vector3 1.0, 0.0, 0.0
+      progress:
+        type: 'f'
+        value: 0.0
 
     @material = new THREE.ShaderMaterial
       uniforms: @uniforms
@@ -26,6 +32,10 @@ class SpectrumBar
 
   setScene: (scene) ->
     scene.add @plane
+    @
+
+  update: (progress) ->
+    @uniforms.progress.value = progress
 
 class SpectrumAnalyzer
   constructor: ->
@@ -54,12 +64,24 @@ class SpectrumAnalyzer
     @geometry.addAttribute 'index', new THREE.BufferAttribute indexes, 1
     @geometry.addAttribute 'uvs', new THREE.BufferAttribute uvs, 3
 
+    @group = new THREE.Object3D
+
     angle = Math.PI / 2.0
     @bars = for i in [0...8]
-      new SpectrumBar @geometry, angle - i * TOTAL_BAR_ANGLE
+      bar = new SpectrumBar @geometry, angle - i * TOTAL_BAR_ANGLE
+      bar.setScene @group
 
   setScene: (scene) ->
-    bar.setScene(scene) for bar in @bars
+    scene.add @group
+
+  resize: (left, top) ->
+    @group.scale.x = left
+    @group.scale.y = top
+
+  update: (timestamp) ->
+    progress = timestamp / 5000
+    progress -= Math.floor progress
+    bar.update(progress) for bar in @bars
 
 module.exports = SpectrumAnalyzer
 

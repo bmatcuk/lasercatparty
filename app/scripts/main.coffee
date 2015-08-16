@@ -1,6 +1,6 @@
 "use strict"
 
-jukebox = require 'scripts/jukebox'
+Jukebox = require 'scripts/jukebox'
 scene = require 'scripts/scene'
 background = require 'scripts/background'
 DanceFloor = require 'scripts/dance_floor'
@@ -17,7 +17,6 @@ rnd = (min, max) ->
 begin = ->
   # do background.loadRandom
   init = Promise.all [
-    do jukebox.init
     scene.init document.getElementById 'container'
     do background.loadRandom
     do backgroundcat.init
@@ -27,7 +26,7 @@ begin = ->
     do muffincat.init
   ]
   init.then (things) ->
-    [jukebox, scene, background, backgroundcat, leftpaw, rightpaw, invisiblebike, muffincat] = things
+    [scene, background, backgroundcat, leftpaw, rightpaw, invisiblebike, muffincat] = things
 
     # add paws to background cat
     backgroundcat.addLeftPaw leftpaw
