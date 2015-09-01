@@ -34,9 +34,11 @@ begin = ->
     backgroundcat.addRightPaw rightpaw
 
     # add background and background cat to scene
+    spectrum = new SpectrumAnalyzer
+    waveform = new Waveform
     scene.addBackgroundObj background
-    scene.addBackgroundObj new SpectrumAnalyzer
-    scene.addBackgroundObj new Waveform
+    scene.addBackgroundObj spectrum
+    scene.addBackgroundObj waveform
     scene.addBackgroundObj backgroundcat
     scene.addMidStationaryObj leftpaw
     scene.addMidStationaryObj rightpaw
@@ -56,6 +58,17 @@ begin = ->
 
     # start rendering
     do scene.start
+
+    # startup the jukebox
+    jukebox = new Jukebox
+    jukebox.loadNext().then (script) ->
+      script.run
+        scene: scene
+        danceFloor: danceFloor
+        spectrum: spectrum
+        waveform: waveform
+      jukebox.play().then ->
+        console.log 'song done'
 
 module.exports = ->
   if document.readyState is 'complete'

@@ -4,12 +4,11 @@ class Waveform
   constructor: ->
     @canvas = document.createElement 'canvas'
     @canvas.width = 1024
-    @canvas.height = 64
+    @canvas.height = 256
 
     @context = @canvas.getContext '2d'
-    @context.fillStyle = '#ff0000'
-    @context.fillRect 0, 0, 1024, 64
-    @context.globalCompositeOperation = 'copy'
+    @waveforms = new Array 16
+    @waveformIdx = 0
 
     @geometry = new THREE.PlaneBufferGeometry 2.0, 1.2
     @texture = new THREE.Texture @canvas
@@ -26,15 +25,28 @@ class Waveform
     @plane.scale.x = left
     @plane.scale.y = top
 
-  update: (timestamp) ->
-    if @lastUpdate? and @context.globalAlpha > 0.0
-      if @lastUpdate < timestamp - 500
-        @context.globalAlpha = @context.globalAlpha - 0.1
-        @context.drawImage @canvas, 0, 0, 1024, 64, 0, 0, 1024, 64
-        @lastUpdate = timestamp
-      @texture.needsUpdate = true
-    else
-      @lastUpdate = timestamp
+  updateWaveform: (waveform) ->
+    @waveforms[@waveformIdx] = new Uint8Array 1024 unless @waveforms[@waveformIdx]?
+    wave = @waveforms[@waveformIdx]
+    for i in [0..waveform.length]
+      wave[i] = 128 - Math.round(waveform[i] * 64)
+    @waveformIdx = (@waveformIdx + 1) & 0x0f
+
+    @context.clearRect 0, 0, 1024, 256
+    idx = @waveformIdx
+    for i in [0...@waveforms.length]
+      wave = @waveforms[idx]
+      continue unless wave
+
+      do @context.beginPath
+      @context.strokeStyle = "rgba(255, 255, 255, #{(i * 16 + 15) / 255})"
+      @context.moveTo 0, @waveforms[idx][0]
+      for x in [1...wave.length]
+        @context.lineTo x, wave[x]
+      do @context.stroke
+      idx = (idx + 1) & 0x0f
+
+    @texture.needsUpdate = true
 
 module.exports = Waveform
 

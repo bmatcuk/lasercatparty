@@ -96,7 +96,6 @@ class Scene
       @perspectiveCamera.position.x = Math.sin(t) * 1000
       @perspectiveCamera.position.z = Math.cos(t) * 1000
       @perspectiveCamera.lookAt LOOKAT
-      #@perspectiveCamera.lookAt @backPerspective.position
 
       # update
       obj.update?(timestamp) for obj in @backgroundObjs

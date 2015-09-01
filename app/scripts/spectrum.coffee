@@ -34,6 +34,9 @@ class SpectrumBar
     scene.add @plane
     @
 
+  setPower: (power) ->
+    @uniforms.power.value = power
+
   update: (progress) ->
     @uniforms.progress.value = progress
 
@@ -77,6 +80,14 @@ class SpectrumAnalyzer
   resize: (left, top) ->
     @group.scale.x = left
     @group.scale.y = top
+
+  updateSpectrum: (spectrum) ->
+    size = spectrum.length / @bars.length
+    for bar, i in @bars
+      sum = 0.0
+      sum += spectrum[j] for j in [(size * i)...(size * (i + 1))]
+      dB = 20 * Math.log10 sum / size
+      bar.setPower(1.0 + dB / 100.0)
 
   update: (timestamp) ->
     progress = timestamp / 5000

@@ -11,9 +11,9 @@ class Jukebox
 
   loadNext: ->
     @currentTrack = (@currentTrack + 1) % MUSIC.length
-    new Promise (resolve, reject) ->
+    new Promise (resolve, reject) =>
       done = =>
-        script = require MUSIC[currentTrack].script
+        script = require MUSIC[@currentTrack].script
         resolve new script @dancer
       @dancer = new Dancer
       @dancer.load src: MUSIC[@currentTrack].audio
@@ -23,7 +23,7 @@ class Jukebox
         @dancer.bind 'loaded', done
 
   play: ->
-    new Promise (resolve, reject) ->
+    new Promise (resolve, reject) =>
       do @dancer.play
       onended = =>
         this.removeEventListener 'ended', onended
