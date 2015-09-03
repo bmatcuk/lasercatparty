@@ -22,9 +22,28 @@ class Background
     @material = new THREE.MeshBasicMaterial map: @texture
     @plane = new THREE.Mesh @geometry, @material
     @plane.position.z = -0.9
+    @plane.visible = false
 
   setScene: (scene) ->
     scene.add @plane
+
+  show: (timestamp, fadein) ->
+    @plane.visible = true
+    if fadein?
+      @material.transparent = true
+      @material.opacity = 0
+      @fadein =
+        start: timestamp
+        length: fadein
+
+  update: (timestamp) ->
+    if @fadein?
+      if timestamp >= @fadein.start + @fadein.length
+        @material.transparent = false
+        @material.opacity = 1
+        @fadein = null
+      else
+        @material.opacity = (timestamp - @fadein.start) / @fadein.length
 
 class BackgroundReflection
   constructor: (@texture) ->
@@ -76,9 +95,13 @@ class BackgroundReflection
 
     @plane = new THREE.Mesh @geometry, @material
     @plane.position.z = -0.8
+    @plane.visible = false
 
   setScene: (scene) ->
     scene.add @plane
+
+  show: ->
+    @plane.visible = true
 
   resize: (left, top) ->
     factor = 2.0 / 5.0

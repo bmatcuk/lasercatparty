@@ -29,10 +29,14 @@ class SpectrumBar
     @plane = new THREE.Mesh @geometry, @material
     @plane.rotateOnAxis(new THREE.Vector3(0, 0, 1), angle)
     @plane.position.z = -0.5
+    @plane.visible = false
 
   setScene: (scene) ->
     scene.add @plane
     @
+
+  show: ->
+    @plane.visible = true
 
   setPower: (power) ->
     @uniforms.power.value = power
@@ -76,6 +80,9 @@ class SpectrumAnalyzer
 
   setScene: (scene) ->
     scene.add @group
+
+  show: ->
+    do bar.show for bar in @bars
 
   resize: (left, top) ->
     @group.scale.x = left

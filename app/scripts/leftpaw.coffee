@@ -9,9 +9,13 @@ class LeftPaw
     @geometry = new THREE.PlaneBufferGeometry width, height
     @material = new THREE.MeshBasicMaterial map: @texture, transparent: true
     @plane = new THREE.Mesh @geometry, @material
+    @plane.visible = false
 
   setScene: (scene) ->
     scene.add @plane
+
+  show: ->
+    @plane.visible = true
 
   catResize: (cat, scale) ->
     xfactor = 2.0 * (58.0 - @texture.image.width / 2.0) / cat.image.width - 1.0

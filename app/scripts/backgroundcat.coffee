@@ -9,9 +9,15 @@ class BackgroundCat
     @geometry = new THREE.PlaneBufferGeometry width, height
     @material = new THREE.MeshBasicMaterial map: @texture, transparent: true
     @plane = new THREE.Mesh @geometry, @material
+    @plane.visible = false
 
   setScene: (scene) ->
     scene.add @plane
+
+  show: ->
+    @plane.visible = true
+    do @leftPaw.show
+    do @rightPaw.show
 
   addLeftPaw: (paw) ->
     @leftPaw = paw

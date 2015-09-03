@@ -26,7 +26,7 @@ class DanceFloor
   setScene: (scene) ->
     scene.add @plane
 
-  show: (timestamp) ->
+  show: ->
     @plane.visible = true
 
   update: (timestamp) ->

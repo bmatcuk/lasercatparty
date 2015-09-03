@@ -8,9 +8,13 @@ class MuffinCat
     @sprite.position.z = z
     #@sprite.position.y = 10
     @sprite.scale.x = @sprite.scale.y = @sprite.scale.z = 200
+    @sprite.visible = false
 
   setScene: (scene) ->
     scene.add @sprite
+
+  show: ->
+    @sprite.visible = true
 
   update: (timestamp) ->
     if @nextUpdate?

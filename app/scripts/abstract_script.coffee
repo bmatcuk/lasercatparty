@@ -18,5 +18,7 @@ class AbstractScript
       objs.waveform.updateWaveform(@getWaveform())
       objs.spectrum.updateSpectrum(@getSpectrum())
 
+    @dancer.onceAt 5, -> objs.background.show window.performance.now(), 2000
+
 module.exports = AbstractScript
 

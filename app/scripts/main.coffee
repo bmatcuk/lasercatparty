@@ -45,7 +45,6 @@ begin = ->
 
     # dance floor
     danceFloor = new DanceFloor
-    danceFloor.show window.performance.now() #TODO: remove
     scene.addBackPerspectiveObj danceFloor
 
     # dancers
@@ -64,6 +63,7 @@ begin = ->
     jukebox.loadNext().then (script) ->
       script.run
         scene: scene
+        background: background
         danceFloor: danceFloor
         spectrum: spectrum
         waveform: waveform
