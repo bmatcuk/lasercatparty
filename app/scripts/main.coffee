@@ -69,6 +69,7 @@ begin = ->
       script.run
         scene: scene
         background: background
+        backgroundcat: backgroundcat
         danceFloor: danceFloor
         spectrum: spectrum
         waveform: waveform
