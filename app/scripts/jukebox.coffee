@@ -10,7 +10,9 @@ class Jukebox
     @currentTrack = Math.floor(Math.random() * MUSIC.length)
 
   loadNext: ->
-    @currentTrack = (@currentTrack + 1) % MUSIC.length
+    #@currentTrack = (@currentTrack + 1) % MUSIC.length
+    @currentTrack = 0 # TODO: remove
+    @playPromise = null
     new Promise (resolve, reject) =>
       done = =>
         script = require MUSIC[@currentTrack].script
@@ -23,13 +25,20 @@ class Jukebox
         @dancer.bind 'loaded', done
 
   play: ->
-    new Promise (resolve, reject) =>
+    if @playPromise
+      do @dancer.play
+      return @playPromise
+
+    @playPromise = new Promise (resolve, reject) =>
       do @dancer.play
       onended = =>
         this.removeEventListener 'ended', onended
         do @dancer.pause
         do resolve
       @dancer.audio.addEventListener 'ended', onended
+
+  pause: ->
+    do @dancer.pause
 
 module.exports = Jukebox
 

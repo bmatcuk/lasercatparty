@@ -16,15 +16,15 @@
   "dependencies": {},
   "devDependencies": {
     "brunch": "^1.8.2",
-    "clean-css-brunch": "^1.7.2",
     "coffee-script-brunch": "^1.8.1",
+    "css-brunch": "~1.7.0",
+    "cssnano": "^3.2.0",
+    "cssnext": "~1.8.4",
+    "glslify-brunch": "~1.0.0",
     "jaded-brunch": "^1.7.13",
     "javascript-brunch": "^1.7.1",
-    "postcss-brunch": "^0.3.1",
-    "postcss-nested": "^0.3.1",
-    "uglify-js-brunch": "^1.7.8",
-    "cssnext": "~1.4.0",
-    "css-brunch": "~1.7.0",
-    "glslify-brunch": "~1.0.0"
+    "postcss-brunch": "^0.5.0",
+    "postcss-nested": "^1.0.0",
+    "uglify-js-brunch": "^1.7.8"
   }
 }

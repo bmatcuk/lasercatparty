@@ -27,5 +27,6 @@ exports.config =
       processors: [
         require('postcss-nested')
         require('cssnext')({browsers: '> 5%'})
+        require('cssnano')
       ]
 

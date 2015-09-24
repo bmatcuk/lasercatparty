@@ -61,6 +61,11 @@ begin = ->
     # startup the jukebox
     jukebox = new Jukebox
     jukebox.loadNext().then (script) ->
+      document.getElementById('albumart').setAttribute 'src', script.image
+      document.getElementById('link').setAttribute 'href', script.url
+      document.getElementById('artist').textContent = script.artist
+      document.getElementById('title').textContent = script.title
+
       script.run
         scene: scene
         background: background
@@ -69,6 +74,15 @@ begin = ->
         waveform: waveform
       jukebox.play().then ->
         console.log 'song done'
+
+    playButton = document.getElementById 'button'
+    playButton.addEventListener 'click', (e) ->
+      do e.preventDefault
+      if playButton.classList.toggle 'pause'
+        do jukebox.play
+      else
+        do jukebox.pause
+      playButton.classList.toggle 'play'
 
 module.exports = ->
   if document.readyState is 'complete'
