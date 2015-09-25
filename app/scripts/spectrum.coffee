@@ -41,8 +41,9 @@ class SpectrumBar
   setPower: (power) ->
     @uniforms.power.value = power
 
-  update: (progress) ->
+  update: (progress, color) ->
     @uniforms.progress.value = progress
+    @uniforms.color.value.set.apply @uniforms.color.value, color
 
 class SpectrumAnalyzer
   constructor: ->
@@ -78,11 +79,20 @@ class SpectrumAnalyzer
       bar = new SpectrumBar @geometry, angle - i * TOTAL_BAR_ANGLE
       bar.setScene @group
 
+    @colorScale = chroma.scale(['red', 'navy', 'red']).mode('lab')
+
   setScene: (scene) ->
     scene.add @group
 
   show: ->
     do bar.show for bar in @bars
+
+  startAnimation: (timestamp, bpm) ->
+    @animationStart = timestamp
+    @beatLength = 60000 / bpm
+
+  stopAnimation: ->
+    @animationStart = null
 
   resize: (left, top) ->
     @group.scale.x = left
@@ -97,9 +107,15 @@ class SpectrumAnalyzer
       bar.setPower(1.0 + dB / 100.0)
 
   update: (timestamp) ->
-    progress = timestamp / 5000
-    progress -= Math.floor progress
-    bar.update(progress) for bar in @bars
+    if @animationStart?
+      progress = (timestamp - @animationStart) / @beatLength
+      progress -= Math.floor progress
+
+      colorProgress = (timestamp - @animationStart) / (@beatLength * 12)
+      colorProgress -= Math.floor colorProgress
+      color = @colorScale(colorProgress).gl()
+
+      bar.update(progress, color) for bar in @bars
 
 module.exports = SpectrumAnalyzer
 

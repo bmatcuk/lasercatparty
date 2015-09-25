@@ -23,15 +23,29 @@ class DanceFloor
     @plane.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / -2.0)
     @plane.visible = false
 
+    @colorScale = chroma.scale(['red', 'navy', 'red']).mode('lab')
+
   setScene: (scene) ->
     scene.add @plane
 
   show: ->
     @plane.visible = true
 
+  startAnimation: (timestamp, bpm) ->
+    @animationStart = timestamp
+    @beatLength = 60000 / bpm
+
+  stopAnimation: ->
+    @animationStart = null
+
   update: (timestamp) ->
-    progress = timestamp / 5000
-    @uniforms.progress.value = progress - Math.floor progress
+    if @animationStart?
+      progress = (timestamp - @animationStart) / @beatLength
+      @uniforms.progress.value = progress - Math.floor progress
+
+      colorProgress = (timestamp - @animationStart) / (@beatLength * 12)
+      colorProgress -= Math.floor colorProgress
+      @uniforms.color.value.set.apply @uniforms.color.value, @colorScale(colorProgress).gl()
 
 module.exports = DanceFloor
 

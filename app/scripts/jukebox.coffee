@@ -32,7 +32,7 @@ class Jukebox
     @playPromise = new Promise (resolve, reject) =>
       do @dancer.play
       onended = =>
-        this.removeEventListener 'ended', onended
+        @dancer.audio.removeEventListener 'ended', onended
         do @dancer.pause
         do resolve
       @dancer.audio.addEventListener 'ended', onended
