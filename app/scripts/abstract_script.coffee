@@ -12,12 +12,14 @@ class AbstractScript
     @objs.background.play timestamp
     @objs.danceFloor.play timestamp
     @objs.spectrum.play timestamp
+    @objs.backgroundcat.play timestamp
     obj.play timestamp for obj in @objs.scene.frontPerspectiveObjs
 
   pause: (timestamp) ->
     @objs.background.pause timestamp
     @objs.danceFloor.pause timestamp
     @objs.spectrum.pause timestamp
+    @objs.backgroundcat.pause timestamp
     obj.pause timestamp for obj in @objs.scene.frontPerspectiveObjs
 
 module.exports = AbstractScript

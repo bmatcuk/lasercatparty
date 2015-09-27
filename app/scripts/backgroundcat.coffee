@@ -10,6 +10,7 @@ class BackgroundCat
     @material = new THREE.MeshBasicMaterial map: @texture, transparent: true
     @plane = new THREE.Mesh @geometry, @material
     @plane.visible = false
+    @paused = false
 
   setScene: (scene) ->
     scene.add @plane
@@ -18,6 +19,18 @@ class BackgroundCat
     @plane.visible = true
     do @leftPaw.show
     do @rightPaw.show
+
+  hide: (timestamp, fadeout) ->
+    @leftPaw.hide timestamp, fadeout
+    @rightPaw.hide timestamp, fadeout
+    if fadeout?
+      @material.transparent = true
+      @material.opacity = 1
+      @fadeout =
+        start: timestamp
+        length: fadeout
+    else
+      @plane.visible = false
 
   addLeftPaw: (paw) ->
     @leftPaw = paw
@@ -42,6 +55,27 @@ class BackgroundCat
         height: @texture.image.height
     @leftPaw?.catResize cat, scale
     @rightPaw?.catResize cat, scale
+
+  play: (timestamp) ->
+    @leftPaw.play timestamp
+    @rightPaw.play timestamp
+    @fadeout.start += timestamp - @paused if @fadeout?
+    @paused = false
+
+  pause: (timestamp) ->
+    @leftPaw.pause timestamp
+    @rightPaw.pause timestamp
+    @paused = timestamp
+
+  update: (timestamp) ->
+    if @fadeout? and !@paused
+      if timestamp >= @fadeout.start + @fadeout.length
+        @plane.visible = false
+        @material.transparent = false
+        @material.opacity = 1
+        @fadeout = null
+      else
+        @material.opacity = (@fadeout.length - timestamp + @fadeout.start) / @fadeout.length
 
 module.exports =
   init: ->

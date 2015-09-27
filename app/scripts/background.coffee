@@ -37,21 +37,41 @@ class Background
         start: timestamp
         length: fadein
 
+  hide: (timestamp, fadeout) ->
+    if fadeout?
+      @material.transparent = true
+      @material.opacity = 1
+      @fadeout =
+        start: timestamp
+        length: fadeout
+    else
+      @plane.visible = false
+
   play: (timestamp) ->
     @fadein.start += timestamp - @paused if @fadein?
+    @fadeout.start += timestamp - @paused if @fadeout?
     @paused = false
 
   pause: (timestamp) ->
     @paused = timestamp
 
   update: (timestamp) ->
-    if @fadein? and !@paused
-      if timestamp >= @fadein.start + @fadein.length
-        @material.transparent = false
-        @material.opacity = 1
-        @fadein = null
-      else
-        @material.opacity = (timestamp - @fadein.start) / @fadein.length
+    unless @paused
+      if @fadein?
+        if timestamp >= @fadein.start + @fadein.length
+          @material.transparent = false
+          @material.opacity = 1
+          @fadein = null
+        else
+          @material.opacity = (timestamp - @fadein.start) / @fadein.length
+      else if @fadeout?
+        if timestamp >= @fadeout.start + @fadeout.length
+          @plane.visible = false
+          @material.transparent = false
+          @material.opacity = 1
+          @fadeout = null
+        else
+          @material.opacity = (@fadeout.length - timestamp + @fadeout.start) / @fadeout.length
 
 class BackgroundReflection
   constructor: (@texture) ->

@@ -10,12 +10,23 @@ class LeftPaw
     @material = new THREE.MeshBasicMaterial map: @texture, transparent: true
     @plane = new THREE.Mesh @geometry, @material
     @plane.visible = false
+    @paused = false
 
   setScene: (scene) ->
     scene.add @plane
 
   show: ->
     @plane.visible = true
+
+  hide: (timestamp, fadeout) ->
+    if fadeout?
+      @material.transparent = true
+      @material.opacity = 1
+      @fadeout =
+        start: timestamp
+        length: fadeout
+    else
+      @plane.visible = false
 
   catResize: (cat, scale) ->
     xfactor = 2.0 * (58.0 - @texture.image.width / 2.0) / cat.image.width - 1.0
@@ -33,6 +44,23 @@ class LeftPaw
     @plane.position.x = cat.position.x + xfactor * cat.geometry.width * scale
     @plane.position.y = cat.position.y + yfactor * cat.geometry.height * scale
     @plane.scale.x = @plane.scale.y = scaleFactor * scale
+
+  play: (timestamp) ->
+    @fadeout.start += timestamp - @paused if @fadeout?
+    @paused = false
+
+  pause: (timestamp) ->
+    @paused = timestamp
+
+  update: (timestamp) ->
+    if @fadeout? and !@paused
+      if timestamp >= @fadeout.start + @fadeout.length
+        @plane.visible = false
+        @material.transparent = false
+        @material.opacity = 1
+        @fadeout = null
+      else
+        @material.opacity = (@fadeout.length - timestamp + @fadeout.start) / @fadeout.length
 
 module.exports =
   init: ->

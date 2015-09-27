@@ -11,7 +11,7 @@ class Jukebox
 
   loadNext: ->
     #@currentTrack = (@currentTrack + 1) % MUSIC.length
-    @currentTrack = 0 # TODO: remove
+    @currentTrack = 1 # TODO: remove
     @playPromise = null
     new Promise (resolve, reject) =>
       done = =>

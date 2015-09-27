@@ -18,6 +18,16 @@ class Dancer
   show: ->
     @sprite.visible = true
 
+  hide: (timestamp, fadeout) ->
+    if fadeout?
+      @material.transparent = true
+      @material.opacity = 1
+      @fadeout =
+        start: timestamp
+        length: fadeout
+    else
+      @sprite.visible = false
+
   startAnimation: (timestamp, bpm) ->
     @beatLength = 60000 / bpm
     @nextUpdate = timestamp + @beatLength
@@ -27,16 +37,26 @@ class Dancer
 
   play: (timestamp) ->
     @nextUpdate += timestamp - @paused if @nextUpdate?
+    @fadeout.start += timestamp - @paused if @fadeout?
     @paused = false
 
   pause: (timestamp) ->
     @paused = timestamp
 
   update: (timestamp) ->
-    if @nextUpdate? and !@paused
-      if @nextUpdate <= timestamp
-        @sprite.scale.x = 0 - @sprite.scale.x
-        @nextUpdate += @beatLength while @nextUpdate <= timestamp
+    unless @paused
+      if @nextUpdate?
+        if @nextUpdate <= timestamp
+          @sprite.scale.x = 0 - @sprite.scale.x
+          @nextUpdate += @beatLength while @nextUpdate <= timestamp
+      if @fadeout?
+        if timestamp >= @fadeout.start + @fadeout.length
+          @sprite.visible = false
+          @material.transparent = false
+          @material.opacity = 1
+          @fadeout = null
+        else
+          @material.opacity = (@fadeout.length - timestamp + @fadeout.start) / @fadeout.length
 
 module.exports = Dancer
 

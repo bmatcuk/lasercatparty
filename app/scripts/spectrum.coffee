@@ -38,6 +38,9 @@ class SpectrumBar
   show: ->
     @plane.visible = true
 
+  hide: ->
+    @plane.visible = false
+
   setPower: (power) ->
     @uniforms.power.value = power
 
@@ -85,6 +88,9 @@ class SpectrumAnalyzer
 
   show: ->
     do bar.show for bar in @bars
+
+  hide: ->
+    do bar.hide for bar in @bars
 
   startAnimation: (timestamp, bpm) ->
     @animationStart = timestamp
