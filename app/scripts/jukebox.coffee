@@ -10,8 +10,7 @@ class Jukebox
     @currentTrack = Math.floor(Math.random() * MUSIC.length)
 
   loadNext: ->
-    #@currentTrack = (@currentTrack + 1) % MUSIC.length
-    @currentTrack = 1 # TODO: remove
+    @currentTrack = (@currentTrack + 1) % MUSIC.length
     @playPromise = null
     new Promise (resolve, reject) =>
       done = =>
