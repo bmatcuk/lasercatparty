@@ -23,6 +23,7 @@ class Background
     @plane = new THREE.Mesh @geometry, @material
     @plane.position.z = -0.9
     @plane.visible = false
+    @paused = false
 
   setScene: (scene) ->
     scene.add @plane
@@ -36,8 +37,15 @@ class Background
         start: timestamp
         length: fadein
 
+  play: (timestamp) ->
+    @fadein.start += timestamp - @paused if @fadein?
+    @paused = false
+
+  pause: (timestamp) ->
+    @paused = timestamp
+
   update: (timestamp) ->
-    if @fadein?
+    if @fadein? and !@paused
       if timestamp >= @fadein.start + @fadein.length
         @material.transparent = false
         @material.opacity = 1

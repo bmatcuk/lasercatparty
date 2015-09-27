@@ -1,7 +1,7 @@
 "use strict"
 
 class DanceFloor
-  constructor: ->
+  constructor: (@colorScale) ->
     @uniforms =
       progress:
         type: 'f'
@@ -22,8 +22,7 @@ class DanceFloor
     @plane = new THREE.Mesh @geometry, @material
     @plane.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / -2.0)
     @plane.visible = false
-
-    @colorScale = chroma.scale(['red', 'navy', 'red']).mode('lab')
+    @paused = false
 
   setScene: (scene) ->
     scene.add @plane
@@ -38,8 +37,15 @@ class DanceFloor
   stopAnimation: ->
     @animationStart = null
 
+  play: (timestamp) ->
+    @animationStart += timestamp - @paused if @animationStart?
+    @paused = false
+
+  pause: (timestamp) ->
+    @paused = timestamp
+
   update: (timestamp) ->
-    if @animationStart?
+    if @animationStart? and !@paused
       progress = (timestamp - @animationStart) / @beatLength
       @uniforms.progress.value = progress - Math.floor progress
 

@@ -25,11 +25,14 @@ class Script extends AbstractScript
       objs.spectrum.show now
       objs.spectrum.startAnimation now, 100
       objs.backgroundcat.show now
-      obj.show now for obj in objs.scene.frontPerspectiveObjs
+      for obj in objs.scene.frontPerspectiveObjs
+        obj.show now
+        obj.startAnimation now, 100
 
     @dancer.onceAt 212, ->
       do objs.danceFloor.stopAnimation
       do objs.spectrum.stopAnimation
+      do obj.stopAnimation for obj in objs.scene.frontPerspectiveObjs
 
 module.exports = Script
 

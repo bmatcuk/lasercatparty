@@ -46,7 +46,7 @@ class SpectrumBar
     @uniforms.color.value.set.apply @uniforms.color.value, color
 
 class SpectrumAnalyzer
-  constructor: ->
+  constructor: (@colorScale) ->
     # calculate vertices for a bar
     tan = Math.tan(BAR_ANGLE / 2.0)
     halfTopWidth = LENGTH_END * tan
@@ -78,8 +78,7 @@ class SpectrumAnalyzer
     @bars = for i in [0...8]
       bar = new SpectrumBar @geometry, angle - i * TOTAL_BAR_ANGLE
       bar.setScene @group
-
-    @colorScale = chroma.scale(['red', 'navy', 'red']).mode('lab')
+    @paused = false
 
   setScene: (scene) ->
     scene.add @group
@@ -94,6 +93,13 @@ class SpectrumAnalyzer
   stopAnimation: ->
     @animationStart = null
 
+  play: (timestamp) ->
+    @animationStart += timestamp - @paused if @animationStart?
+    @paused = false
+
+  pause: (timestamp) ->
+    @paused = timestamp
+
   resize: (left, top) ->
     @group.scale.x = left
     @group.scale.y = top
@@ -107,7 +113,7 @@ class SpectrumAnalyzer
       bar.setPower(1.0 + dB / 100.0)
 
   update: (timestamp) ->
-    if @animationStart?
+    if @animationStart? and !@paused
       progress = (timestamp - @animationStart) / @beatLength
       progress -= Math.floor progress
 

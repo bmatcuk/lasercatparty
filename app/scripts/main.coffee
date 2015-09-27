@@ -14,6 +14,8 @@ muffincat = require 'scripts/muffincat'
 
 rnd = (min, max) ->
   Math.random() * (max - min) + min
+rndi = (min, max) ->
+  Math.floor rnd min, max
 
 begin = ->
   # do background.loadRandom
@@ -29,12 +31,15 @@ begin = ->
   init.then (things) ->
     [scene, background, backgroundcat, leftpaw, rightpaw, invisiblebike, muffincat] = things
 
+    # color scale
+    colorScale = chroma.scale(['hsl(0,90%,50%)', 'hsl(180,90%,50%)', 'hsl(350,90%,50%)']).mode('hsl')
+
     # add paws to background cat
     backgroundcat.addLeftPaw leftpaw
     backgroundcat.addRightPaw rightpaw
 
     # add background and background cat to scene
-    spectrum = new SpectrumAnalyzer
+    spectrum = new SpectrumAnalyzer colorScale
     waveform = new Waveform
     scene.addBackgroundObj background
     scene.addBackgroundObj spectrum
@@ -44,15 +49,21 @@ begin = ->
     scene.addMidStationaryObj rightpaw
 
     # dance floor
-    danceFloor = new DanceFloor
+    danceFloor = new DanceFloor colorScale
     scene.addBackPerspectiveObj danceFloor
 
     # dancers
+    dancePositions = []
+    for i in [0...4]
+      for j in [0...4]
+        dancePositions.push [-400 + 200 * i + rnd(0, 200), -400 + 200 * j + rnd(0, 200)]
     for i in [0..5]
-      bike = invisiblebike rnd(-400, 400), rnd(-400, 400)
+      pos = dancePositions.splice(rndi(0, dancePositions.length), 1)[0]
+      bike = invisiblebike.apply null, pos
       scene.addFrontPerspectiveObj bike
     for i in [0..5]
-      muffin = muffincat rnd(-400, 400), rnd(-400, 400)
+      pos = dancePositions.splice(rndi(0, dancePositions.length), 1)[0]
+      muffin = muffincat.apply null, pos
       scene.addFrontPerspectiveObj muffin
 
     # start rendering
@@ -60,11 +71,23 @@ begin = ->
 
     # startup the jukebox
     jukebox = new Jukebox
-    jukebox.loadNext().then (script) ->
+    runner = (script) ->
       document.getElementById('albumart').setAttribute 'src', script.image
       document.getElementById('link').setAttribute 'href', script.url
       document.getElementById('artist').textContent = script.artist
       document.getElementById('title').textContent = script.title
+      document.getElementById('controls').style.display = 'block'
+
+      playButton = document.getElementById 'button'
+      toggle = (e) ->
+        do e.preventDefault
+        if playButton.classList.toggle 'pause'
+          do jukebox.play
+        else
+          script.pause window.performance.now()
+          jukebox.pause().then -> script.play window.performance.now()
+        playButton.classList.toggle 'play'
+      playButton.addEventListener 'click', toggle
 
       script.run
         scene: scene
@@ -74,16 +97,10 @@ begin = ->
         spectrum: spectrum
         waveform: waveform
       jukebox.play().then ->
-        console.log 'song done'
-
-    playButton = document.getElementById 'button'
-    playButton.addEventListener 'click', (e) ->
-      do e.preventDefault
-      if playButton.classList.toggle 'pause'
-        do jukebox.play
-      else
-        do jukebox.pause
-      playButton.classList.toggle 'play'
+        document.getElementById('controls').style.display = 'none'
+        playButton.removeEventListener 'click', toggle
+        # TODO: jukebox.loadNext().then runner
+    jukebox.loadNext().then runner
 
 module.exports = ->
   if document.readyState is 'complete'

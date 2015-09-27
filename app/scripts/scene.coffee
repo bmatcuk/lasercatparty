@@ -2,6 +2,7 @@
 
 CAMERA_Y = 250
 LOOKAT = new THREE.Vector3 0, CAMERA_Y, 0
+AUTOROTATE_FACTOR = 0.00005
 
 class Scene
   constructor: (parent) ->
@@ -33,6 +34,8 @@ class Scene
     @perspectiveCamera = new THREE.PerspectiveCamera 75, aspect, 0.1, 2000
     @perspectiveCamera.position.y = CAMERA_Y
     @perspectiveCamera.position.z = 1000
+    @autoRotate = false
+    @manualRotate = 0
 
     # renderer
     @renderer = new THREE.WebGLRenderer antialias: true
@@ -92,9 +95,9 @@ class Scene
       requestAnimationFrame render
 
       # rotate the camera
-      t = timestamp * 0.00005
-      @perspectiveCamera.position.x = Math.sin(t) * 1000
-      @perspectiveCamera.position.z = Math.cos(t) * 1000
+      @manualRotate = (timestamp - @autoRotate) * AUTOROTATE_FACTOR if @autoRotate
+      @perspectiveCamera.position.x = Math.sin(@manualRotate) * 1000
+      @perspectiveCamera.position.z = Math.cos(@manualRotate) * 1000
       @perspectiveCamera.lookAt LOOKAT
 
       # update
@@ -115,11 +118,39 @@ class Scene
 
     # start the rendering loop
     @paused = false
-    render window.performance.now()
+    @autoRotate = window.performance.now()
+    render @autoRotate
 
   pause: -> @paused = true
 
+  startAutoRotate: (timestamp) ->
+    @autoRotate = timestamp - @manualRotate / AUTOROTATE_FACTOR
+
+  stopAutoRotate: ->
+    @autoRotate = false
+
 module.exports =
   init: (parent) ->
-    Promise.resolve new Scene parent
+    scene = new Scene parent
+
+    autoRotateTimeout = null
+    mousedown = (e) ->
+      if autoRotateTimeout?
+        clearTimeout autoRotateTimeout
+        autoRotateTimeout = null
+      do scene.stopAutoRotate
+
+      x = e.clientX
+      mousemove = (e) ->
+        scene.manualRotate -= (e.clientX - x) * 0.01
+        x = e.clientX
+      mouseup = (e) ->
+        autoRotateTimeout = setTimeout((-> scene.startAutoRotate window.performance.now()), 1000)
+        parent.removeEventListener 'mousemove', mousemove
+        parent.removeEventListener 'mouseup', mouseup
+      parent.addEventListener 'mousemove', mousemove
+      parent.addEventListener 'mouseup', mouseup
+    parent.addEventListener 'mousedown', mousedown
+
+    Promise.resolve scene
 

@@ -33,12 +33,18 @@ class Jukebox
       do @dancer.play
       onended = =>
         @dancer.audio.removeEventListener 'ended', onended
+        @playPromise = null
         do @dancer.pause
         do resolve
       @dancer.audio.addEventListener 'ended', onended
 
   pause: ->
-    do @dancer.pause
+    new Promise (resolve, reject) =>
+      do @dancer.pause
+      onunpaused = =>
+        @dancer.audio.removeEventListener 'play', onunpaused
+        do resolve
+      @dancer.audio.addEventListener 'play', onunpaused
 
 module.exports = Jukebox
 
