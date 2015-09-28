@@ -1,9 +1,29 @@
 doctype html
 html
-  head
+  head(prefix='og: http://ogp.me/ns#')
+    meta(charset='utf-8')/
     title laser cat party!
-    link(rel="stylesheet", type="text/css", href="/stylesheets/placeholder.css")
+    meta(name='description', content="welcome to laser cat's dance party!")/
+    meta(property='og:title', content='laser cat party!')/
+    meta(property='og:description', content="welcome to laser cat's dance party!")/
+    meta(property='og:type', content='website')/
+    meta(property='og:url', content='http://lasercat.party/')/
+    meta(property='og:image', content='http://lasercat.party/images/og.png')/
+    meta(property='og:image:type', content='image/png')/
+    meta(property='og:image:width', content='280')/
+    meta(property='og:image:height', content='280')/
+
+    link(rel="stylesheet", type="text/css", href="/stylesheets/app.css")
+    script(type="text/javascript", src="/javascripts/vendor.js")
+    script(type="text/javascript", src="/javascripts/app.js")
+    script(type="text/javascript") require("scripts/main")();
   body
-    script(type="text/javascript", src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js")
-    script(type="text/javascript", src="/javascripts/placeholder.js")
+    #container
+    #controls
+      a#button.pause(href="#")
+      img#albumart()/
+      a#link(href="#")
+        span#artist
+        br/
+        span#title
 
