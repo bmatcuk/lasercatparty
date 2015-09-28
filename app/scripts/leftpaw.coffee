@@ -20,7 +20,6 @@ class LeftPaw
 
   hide: (timestamp, fadeout) ->
     if fadeout?
-      @material.transparent = true
       @material.opacity = 1
       @fadeout =
         start: timestamp
@@ -56,7 +55,6 @@ class LeftPaw
     if @fadeout? and !@paused
       if timestamp >= @fadeout.start + @fadeout.length
         @plane.visible = false
-        @material.transparent = false
         @material.opacity = 1
         @fadeout = null
       else
