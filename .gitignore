@@ -3,4 +3,5 @@ node_modules/
 public/
 *.swp
 npm-debug.log*
+*.tar*
 
