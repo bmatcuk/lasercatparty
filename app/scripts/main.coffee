@@ -18,11 +18,14 @@ rndi = (min, max) ->
   Math.floor rnd min, max
 
 begin = ->
+  # color scale
+  colorScale = chroma.scale(['hsl(0,90%,50%)', 'hsl(180,90%,50%)', 'hsl(350,90%,50%)']).mode('hsl')
+
   # do background.loadRandom
   init = Promise.all [
     scene.init document.getElementById 'container'
     do background.loadRandom
-    do backgroundcat.init
+    backgroundcat.init colorScale
     do leftpaw.init
     do rightpaw.init
     do invisiblebike.init
@@ -30,9 +33,6 @@ begin = ->
   ]
   init.then (things) ->
     [scene, background, backgroundcat, leftpaw, rightpaw, invisiblebike, muffincat] = things
-
-    # color scale
-    colorScale = chroma.scale(['hsl(0,90%,50%)', 'hsl(180,90%,50%)', 'hsl(350,90%,50%)']).mode('hsl')
 
     # add paws to background cat
     backgroundcat.addLeftPaw leftpaw

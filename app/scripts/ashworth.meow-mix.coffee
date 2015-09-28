@@ -11,6 +11,15 @@ class Script extends AbstractScript
   run: (objs) ->
     super objs
 
+    kickCount = 0
+    kick = @dancer.createKick
+      onKick: ->
+        do objs.backgroundcat.lasersOn if kickCount is 0
+        kickCount = (kickCount + 1) & 0x03
+
+      offKick: ->
+        do objs.backgroundcat.lasersOff if kickCount is 3
+
     @dancer.onceAt 22.5, -> objs.background.show window.performance.now(), 7500
 
     @dancer.onceAt 41.1, ->
@@ -20,6 +29,8 @@ class Script extends AbstractScript
       objs.spectrum.show now
       objs.spectrum.startAnimation now, 128
       objs.backgroundcat.show now
+      objs.backgroundcat.startAnimation now, 128
+      do kick.on
       for obj in objs.scene.frontPerspectiveObjs
         obj.show now
         obj.startAnimation now, 128
@@ -31,6 +42,8 @@ class Script extends AbstractScript
       now = window.performance.now()
       objs.danceFloor.hide now, 1875
       objs.backgroundcat.hide now, 1875
+      do objs.backgroundcat.stopAnimation
+      do kick.off
       obj.hide now, 1875 for obj in objs.scene.frontPerspectiveObjs
 
     @dancer.onceAt 142.475, ->
