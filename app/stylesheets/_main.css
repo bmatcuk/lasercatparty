@@ -89,4 +89,63 @@ body {
     span#title { color: color(var(--text) blackness(80%)); }
   }
 }
+#loading {
+  background: url(/images/loading.gif);
+  margin: -187px 0 0 -250px;
+  position: absolute;
+  height: 375px;
+  width: 500px;
+  left: 50%;
+  top: 50%;
+
+  progress {
+    background: transparent;
+    position: absolute;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -o-appearance: none;
+    appearance: none;
+    height: 12px;
+    border: none;
+    color: white;
+    width: 100%;
+    bottom: 0;
+
+    &, &::-webkit-progress-bar { background: transparent; }
+    &::-webkit-progress-value {
+      background: url(/images/progress.png) repeat-x;
+      background-size: auto 12px;
+      position: relative;
+
+      &:after {
+        background: url(/images/nyan.png);
+        background-size: 21px 12px;
+        position: absolute;
+        display: block;
+        right: -10px;
+        height: 12px;
+        width: 21px;
+        content: '';
+        top: 0;
+      }
+    }
+    &::-moz-progress-bar {
+      background: url(/images/progress.png) repeat-x;
+      background-size: auto 12px;
+      position: relative;
+
+      &:after {
+        background: url(/images/nyan.png);
+        background-size: 21px 12px;
+        position: absolute;
+        display: block;
+        right: -10px;
+        height: 12px;
+        width: 21px;
+        content: '';
+        top: 0;
+      }
+    }
+  }
+}
 

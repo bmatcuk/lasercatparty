@@ -21,17 +21,24 @@ begin = ->
   # color scale
   colorScale = chroma.scale(['hsl(0,90%,50%)', 'hsl(180,90%,50%)', 'hsl(350,90%,50%)']).mode('hsl')
 
-  # do background.loadRandom
-  init = Promise.all [
-    scene.init document.getElementById 'container'
-    do background.loadRandom
-    backgroundcat.init colorScale
-    do leftpaw.init
-    do rightpaw.init
-    do invisiblebike.init
-    do muffincat.init
+  progress = document.getElementById 'progress'
+  markProgress = (obj) ->
+    progress.setAttribute 'value', +progress.getAttribute('value') + 1
+    obj
+
+  loaders = [
+    scene.init(document.getElementById 'container').then markProgress
+    background.loadRandom().then markProgress
+    backgroundcat.init(colorScale).then markProgress
+    leftpaw.init().then markProgress
+    rightpaw.init().then markProgress
+    invisiblebike.init().then markProgress
+    muffincat.init().then markProgress
   ]
-  init.then (things) ->
+
+  # +1 to max for song loading down below
+  progress.setAttribute 'max', loaders.length + 1
+  Promise.all(loaders).then (things) ->
     [scene, background, backgroundcat, leftpaw, rightpaw, invisiblebike, muffincat] = things
 
     # add paws to background cat
@@ -72,11 +79,13 @@ begin = ->
     # startup the jukebox
     jukebox = new Jukebox
     runner = (script) ->
+      do markProgress
       document.getElementById('albumart').setAttribute 'src', script.image
       document.getElementById('link').setAttribute 'href', script.url
       document.getElementById('artist').textContent = script.artist
       document.getElementById('title').textContent = script.title
       document.getElementById('controls').style.display = 'block'
+      document.getElementById('loading').style.display = 'none'
 
       playButton = document.getElementById 'button'
       toggle = (e) ->
@@ -97,9 +106,12 @@ begin = ->
         spectrum: spectrum
         waveform: waveform
       jukebox.play().then ->
+        # set progress back one because we need to load a new song
+        progress.setAttribute 'value', +progress.getAttribute('value') - 1
         document.getElementById('controls').style.display = 'none'
+        document.getElementById('loading').style.display = ''
         playButton.removeEventListener 'click', toggle
-        # TODO: jukebox.loadNext().then runner
+        jukebox.loadNext().then runner
     jukebox.loadNext().then runner
 
 module.exports = ->
