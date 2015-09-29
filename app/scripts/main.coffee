@@ -21,7 +21,7 @@ begin = ->
   # color scale
   colorScale = chroma.scale(['hsl(0,90%,50%)', 'hsl(180,90%,50%)', 'hsl(350,90%,50%)']).mode('hsl')
 
-  progress = document.getElementById 'progress'
+  progress = document.getElementById 'loading-progress'
   markProgress = (obj) ->
     progress.setAttribute 'value', +progress.getAttribute('value') + 1
     obj
@@ -76,18 +76,37 @@ begin = ->
     # start rendering
     do scene.start
 
-    # startup the jukebox
-    jukebox = new Jukebox
-    runner = (script) ->
-      do markProgress
-      document.getElementById('albumart').setAttribute 'src', script.image
-      document.getElementById('link').setAttribute 'href', script.url
-      document.getElementById('artist').textContent = script.artist
-      document.getElementById('title').textContent = script.title
-      document.getElementById('controls').style.display = 'block'
-      document.getElementById('loading').style.display = 'none'
+    # ui elements
+    loading = document.getElementById 'loading'
+    controls = document.getElementById 'controls'
+    playButton = document.getElementById 'button'
+    albumart = document.getElementById 'albumart'
+    link = document.getElementById 'link'
+    artist = document.getElementById 'artist'
+    title = document.getElementById 'title'
+    songProgress = document.getElementById 'song-progress'
+    volume = document.getElementById 'volume'
 
-      playButton = document.getElementById 'button'
+    # size of the songProgress bar
+    resizeSongProgress = ->
+      if controls.style.display is 'block'
+        width = controls.offsetWidth - (link.offsetLeft + link.offsetWidth) - (volume.offsetWidth + 40) - 40
+        songProgress.style.width = "#{width}px"
+    window.addEventListener 'resize', resizeSongProgress
+
+    # startup the jukebox
+    jukebox = new Jukebox songProgress, volume
+    runner = (script) ->
+      # update the ui
+      do markProgress
+      albumart.setAttribute 'src', script.image
+      link.setAttribute 'href', script.url
+      artist.textContent = script.artist
+      title.textContent = script.title
+      controls.style.display = 'block'
+      loading.style.display = 'none'
+      do resizeSongProgress
+
       toggle = (e) ->
         do e.preventDefault
         if playButton.classList.toggle 'pause'
@@ -108,8 +127,8 @@ begin = ->
       jukebox.play().then ->
         # set progress back one because we need to load a new song
         progress.setAttribute 'value', +progress.getAttribute('value') - 1
-        document.getElementById('controls').style.display = 'none'
-        document.getElementById('loading').style.display = ''
+        controls.style.display = 'none'
+        loading.style.display = ''
         playButton.removeEventListener 'click', toggle
         jukebox.loadNext().then runner
     jukebox.loadNext().then runner

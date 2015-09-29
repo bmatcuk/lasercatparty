@@ -7,6 +7,54 @@ body {
   padding: 0;
   margin: 0;
 }
+
+progress {
+  background: rgba(255, 255, 255, 0.1);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -o-appearance: none;
+  appearance: none;
+  height: 12px;
+  border: none;
+  color: white;
+
+  &, &::-webkit-progress-bar { background: rgba(255, 255, 255, 0.1); }
+  &::-webkit-progress-value {
+    background: url(/images/progress.png) repeat-x;
+    background-size: auto 12px;
+    position: relative;
+
+    &:after {
+      background: url(/images/nyan.png);
+      background-size: 21px 12px;
+      position: absolute;
+      display: block;
+      right: -10px;
+      height: 12px;
+      width: 21px;
+      content: '';
+      top: 0;
+    }
+  }
+  &::-moz-progress-bar {
+    background: url(/images/progress.png) repeat-x;
+    background-size: auto 12px;
+    position: relative;
+
+    &:after {
+      background: url(/images/nyan.png);
+      background-size: 21px 12px;
+      position: absolute;
+      display: block;
+      right: -10px;
+      height: 12px;
+      width: 21px;
+      content: '';
+      top: 0;
+    }
+  }
+}
+
 #container {
   width: 100%;
   height: 100%;
@@ -24,6 +72,7 @@ body {
     }
   }
 }
+
 #controls {
   background-color: black;
   position: absolute;
@@ -88,7 +137,31 @@ body {
     span { line-height: 18px; font-size: 16px; }
     span#title { color: color(var(--text) blackness(80%)); }
   }
+
+  progress {
+    margin-left: 20px;
+    margin-top: 15px;
+    float: left;
+
+    &#volume {
+      margin-right: 20px;
+      float: right;
+      width: 100px;
+
+      cursor: move;
+      cursor: grab;
+      cursor: -moz-grab;
+      cursor: -webkit-grab;
+
+      &:active {
+        cursor: grabbing;
+        cursor: -moz-grabbing;
+        cursor: -webkit-grabbing;
+      }
+    }
+  }
 }
+
 #loading {
   background: url(/images/loading.gif);
   margin: -187px 0 0 -250px;
@@ -99,53 +172,9 @@ body {
   top: 50%;
 
   progress {
-    background: transparent;
     position: absolute;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    -o-appearance: none;
-    appearance: none;
-    height: 12px;
-    border: none;
-    color: white;
     width: 100%;
     bottom: 0;
-
-    &, &::-webkit-progress-bar { background: transparent; }
-    &::-webkit-progress-value {
-      background: url(/images/progress.png) repeat-x;
-      background-size: auto 12px;
-      position: relative;
-
-      &:after {
-        background: url(/images/nyan.png);
-        background-size: 21px 12px;
-        position: absolute;
-        display: block;
-        right: -10px;
-        height: 12px;
-        width: 21px;
-        content: '';
-        top: 0;
-      }
-    }
-    &::-moz-progress-bar {
-      background: url(/images/progress.png) repeat-x;
-      background-size: auto 12px;
-      position: relative;
-
-      &:after {
-        background: url(/images/nyan.png);
-        background-size: 21px 12px;
-        position: absolute;
-        display: block;
-        right: -10px;
-        height: 12px;
-        width: 21px;
-        content: '';
-        top: 0;
-      }
-    }
   }
 }
 

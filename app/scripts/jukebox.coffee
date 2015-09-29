@@ -6,16 +6,42 @@ MUSIC = [
 ]
 
 class Jukebox
-  constructor: ->
+  constructor: (@songProgress, @volume) ->
     @currentTrack = Math.floor(Math.random() * MUSIC.length)
+
+    # handle volume changes
+    mousedown = (e) =>
+      return unless @dancer?
+      mousemove = (e) =>
+        vol = Math.min(1.0, Math.max(0.0, (e.clientX - @volume.offsetLeft) / @volume.offsetWidth))
+        @dancer.setVolume vol
+        @volume.setAttribute 'value', @dancer.getVolume()
+      mouseup = (e) =>
+        mousemove e
+        @volume.removeEventListener 'mousemove', mousemove
+        @volume.removeEventListener 'mouseup', mouseup
+      @volume.addEventListener 'mousemove', mousemove
+      @volume.addEventListener 'mouseup', mouseup
+    @volume.addEventListener 'mousedown', mousedown
 
   loadNext: ->
     @currentTrack = (@currentTrack + 1) % MUSIC.length
     @playPromise = null
     new Promise (resolve, reject) =>
       done = =>
+        @dancer.unbind 'loaded'
+
+        @progressHandler = =>
+          @songProgress.setAttribute 'value', @dancer.audio.currentTime
+        @songProgress.setAttribute 'max', @dancer.audio.duration
+        @dancer.audio.addEventListener 'timeupdate', @progressHandler
+        console.log @dancer.audio.volume
+        console.log @dancer.audioAdapter.gain.gain.value
+
+        @volume.setAttribute 'value', @dancer.getVolume()
         script = require MUSIC[@currentTrack].script
         resolve new script @dancer
+
       @dancer = new Dancer
       @dancer.load src: MUSIC[@currentTrack].audio
       if @dancer.isLoaded()
@@ -31,7 +57,9 @@ class Jukebox
     @playPromise = new Promise (resolve, reject) =>
       do @dancer.play
       onended = =>
+        @dancer.audio.removeEventListener 'timeupdate', @progressHandler
         @dancer.audio.removeEventListener 'ended', onended
+        @progressHandler = null
         @playPromise = null
         do @dancer.pause
         do resolve
