@@ -20,6 +20,11 @@ class Script extends AbstractScript
       offKick: ->
         do objs.backgroundcat.lasersOff if kickCount is 3
 
+    @onceAtRandomOnBeat 0, 7, 100, =>
+      now = window.performance.now()
+      curve = new Bezier -1.5,-0.3, 0,0, 1.5,-0.3
+      @randomFlyingCat().startAnimation now, curve, 100 * 36
+
     @dancer.onceAt 3.14, -> objs.background.show window.performance.now(), 7000
 
     @dancer.onceAt 10.7, ->

@@ -11,6 +11,7 @@ leftpaw = require 'scripts/leftpaw'
 rightpaw = require 'scripts/rightpaw'
 invisiblebike = require 'scripts/invisiblebike'
 muffincat = require 'scripts/muffincat'
+pizzacat = require 'scripts/pizzacat'
 
 rnd = (min, max) ->
   Math.random() * (max - min) + min
@@ -34,12 +35,13 @@ begin = ->
     rightpaw.init().then markProgress
     invisiblebike.init().then markProgress
     muffincat.init().then markProgress
+    pizzacat.init().then markProgress
   ]
 
   # +1 to max for song loading down below
   progress.setAttribute 'max', loaders.length + 1
   Promise.all(loaders).then (things) ->
-    [scene, background, backgroundcat, leftpaw, rightpaw, invisiblebike, muffincat] = things
+    [scene, background, backgroundcat, leftpaw, rightpaw, invisiblebike, muffincat, pizzacat] = things
 
     # add paws to background cat
     backgroundcat.addLeftPaw leftpaw
@@ -72,6 +74,9 @@ begin = ->
       pos = dancePositions.splice(rndi(0, dancePositions.length), 1)[0]
       muffin = muffincat.apply null, pos
       scene.addFrontPerspectiveObj muffin
+
+    # flying cats
+    scene.addFrontStationaryObj pizzacat
 
     # start rendering
     do scene.start

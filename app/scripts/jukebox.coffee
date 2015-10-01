@@ -35,8 +35,6 @@ class Jukebox
           @songProgress.setAttribute 'value', @dancer.audio.currentTime
         @songProgress.setAttribute 'max', @dancer.audio.duration
         @dancer.audio.addEventListener 'timeupdate', @progressHandler
-        console.log @dancer.audio.volume
-        console.log @dancer.audioAdapter.gain.gain.value
 
         @volume.setAttribute 'value', @dancer.getVolume()
         script = require MUSIC[@currentTrack].script

@@ -23,6 +23,8 @@ class Scene
     @midStationaryObjs = []
     @frontPerspective = new THREE.Scene
     @frontPerspectiveObjs = []
+    @frontStationary = new THREE.Scene
+    @frontStationaryObjs = []
 
     # ortho camera
     if aspect <= 1.0
@@ -89,6 +91,10 @@ class Scene
     @frontPerspectiveObjs.push obj
     obj.setScene @frontPerspective
 
+  addFrontStationaryObj: (obj) ->
+    @frontStationaryObjs.push obj
+    obj.setScene @frontStationary
+
   start: ->
     render = (timestamp) =>
       return if @paused
@@ -105,6 +111,7 @@ class Scene
       obj.update?(timestamp) for obj in @backPerspectiveObjs
       obj.update?(timestamp) for obj in @midStationaryObjs
       obj.update?(timestamp) for obj in @frontPerspectiveObjs
+      obj.update?(timestamp) for obj in @frontStationaryObjs
 
       # render
       do @renderer.clear
@@ -115,6 +122,8 @@ class Scene
       @renderer.render @midStationary, @orthoCamera
       do @renderer.clearDepth
       @renderer.render @frontPerspective, @perspectiveCamera
+      do @renderer.clearDepth
+      @renderer.render @frontStationary, @orthoCamera
 
     # start the rendering loop
     @paused = false
