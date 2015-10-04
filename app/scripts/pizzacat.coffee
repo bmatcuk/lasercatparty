@@ -3,8 +3,8 @@
 FlyingCat = require 'scripts/flyingcat'
 
 class PizzaCat extends FlyingCat
-  constructor: (texture, curve) ->
-    super texture, curve
+  constructor: (texture, path) ->
+    super texture, path
     @sprite.scale.x = @sprite.scale.y = @sprite.scale.z = 0.3
 
 module.exports =

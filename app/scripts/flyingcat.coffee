@@ -10,34 +10,83 @@ class FlyingCat
   setScene: (scene) ->
     scene.add @sprite
 
-  startAnimation: (timestamp, @curve, @animationLength) ->
-    if @curve.get(0).x < @curve.get(1).x
-      @sprite.scale.x = 0 - @sprite.scale.x if @sprite.scale.x < 0
-    else if @sprite.scale.x > 0
-      @sprite.scale.x = 0 - @sprite.scale.x
-
-    @animationStart = timestamp
+  show: ->
     @sprite.visible = true
 
+  hide: ->
+    @sprite.visible = false
+
+  set: (x, y) ->
+    @sprite.position.x = x
+    @sprite.position.y = y
+
+  moveTo: (x, y, timestamp, length, ease) ->
+    new Promise (resolve, reject) =>
+      if x < @sprite.position.x
+        @sprite.scale.x = 0 - @sprite.scale.x unless @sprite.scale.x < 0
+      else if @sprite.scale.x < 0
+        @sprite.scale.x = 0 - @sprite.scale.x
+
+      @animation =
+        timestamp: timestamp
+        length: length
+        from:
+          x: @sprite.position.x
+          y: @sprite.position.y
+        to:
+          x: x
+          y: y
+        ease: ease
+        resolve: resolve
+
+  hover: (dy, timestamp, length, cycles) ->
+    new Promise (resolve, reject) =>
+      @animation =
+        timestamp: timestamp
+        length: length
+        from:
+          x: @sprite.position.x
+          y: @sprite.position.y
+        to:
+          x: @sprite.position.x
+          y: @sprite.position.y + dy
+        ease: 'hover'
+        cycles: cycles
+        resolve: resolve
+
   stopAnimation: ->
-    @animationStart = null
+    @animation = null
 
   play: (timestamp) ->
-    @animationStart += timestamp - @paused if @animationStart
+    @animation.timestamp += timestamp - @paused if @animation
     @paused = false
 
   pause: (timestamp) ->
     @paused = timestamp
 
   update: (timestamp) ->
-    if @animationStart and !@paused
-      if timestamp > @animationStart + @animationLength
-        @sprite.visible = false
+    if @animation and !@paused
+      if timestamp > @animation.timestamp + @animation.length
+        resolve = @animation.resolve
+        @sprite.position.x = @animation.to.x
+        @sprite.position.y = @animation.to.y
         do @stopAnimation
+        resolve @
       else
-        point = @curve.get (timestamp - @animationStart) / @animationLength
-        @sprite.position.x = point.x
-        @sprite.position.y = point.y
+        progress = (timestamp - @animation.timestamp) / @animation.length
+        if @animation.ease?
+          switch @animation.ease
+            when 'ease'
+              progress = (Math.cos(progress * Math.PI) - 1.0) / -2.0
+            when 'easein'
+              progress = 1.0 - Math.cos(progress * Math.PI / 2.0)
+            when 'easeout'
+              progress = Math.sin(progress * Math.PI / 2.0)
+            when 'hover'
+              progress = Math.sin(progress * 2.0 * Math.PI * @animation.cycles)
+
+        @sprite.position.x = (@animation.to.x - @animation.from.x) * progress + @animation.from.x
+        @sprite.position.y = (@animation.to.y - @animation.from.y) * progress + @animation.from.y
 
 module.exports = FlyingCat
 

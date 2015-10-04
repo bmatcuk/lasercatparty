@@ -7,7 +7,6 @@ AUTOROTATE_FACTOR = 0.00005
 class Scene
   constructor: (parent) ->
     @paused = true
-    @bpm = 140
 
     # get dimensions
     width = parent.clientWidth

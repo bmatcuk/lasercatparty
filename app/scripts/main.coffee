@@ -12,6 +12,7 @@ rightpaw = require 'scripts/rightpaw'
 invisiblebike = require 'scripts/invisiblebike'
 muffincat = require 'scripts/muffincat'
 pizzacat = require 'scripts/pizzacat'
+nyancat = require 'scripts/nyancat'
 
 rnd = (min, max) ->
   Math.random() * (max - min) + min
@@ -36,12 +37,13 @@ begin = ->
     invisiblebike.init().then markProgress
     muffincat.init().then markProgress
     pizzacat.init().then markProgress
+    nyancat.init().then markProgress
   ]
 
   # +1 to max for song loading down below
   progress.setAttribute 'max', loaders.length + 1
   Promise.all(loaders).then (things) ->
-    [scene, background, backgroundcat, leftpaw, rightpaw, invisiblebike, muffincat, pizzacat] = things
+    [scene, background, backgroundcat, leftpaw, rightpaw, invisiblebike, muffincat, pizzacat, nyancat] = things
 
     # add paws to background cat
     backgroundcat.addLeftPaw leftpaw
@@ -76,6 +78,15 @@ begin = ->
       scene.addFrontPerspectiveObj muffin
 
     # flying cats
+    nyans = []
+    for i in [0...5]
+      nyan = nyancat -0.75, 0.04 + 0.02 * Math.random()
+      scene.addBackgroundObj nyan
+      nyans.push nyan
+    for i in [0...5]
+      nyan = nyancat -0.75, 0.06 + 0.02 * Math.random()
+      scene.addFrontStationaryObj nyan
+      nyans.push nyan
     scene.addFrontStationaryObj pizzacat
 
     # start rendering
@@ -129,6 +140,8 @@ begin = ->
         danceFloor: danceFloor
         spectrum: spectrum
         waveform: waveform
+        nyans: nyans
+        pizzacat: pizzacat
       jukebox.play().then ->
         # set progress back one because we need to load a new song
         progress.setAttribute 'value', +progress.getAttribute('value') - 1

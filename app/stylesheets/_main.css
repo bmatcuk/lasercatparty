@@ -21,16 +21,16 @@ progress {
   &, &::-webkit-progress-bar { background: rgba(255, 255, 255, 0.1); }
   &::-webkit-progress-value {
     background: url(/images/progress.png) repeat-x;
-    background-size: auto 12px;
+    background-size: auto 13px;
     position: relative;
 
     &:after {
       background: url(/images/nyan.png);
-      background-size: 21px 12px;
+      background-size: 21px 13px;
       position: absolute;
       display: block;
       right: -10px;
-      height: 12px;
+      height: 13px;
       width: 21px;
       content: '';
       top: 0;
@@ -38,16 +38,16 @@ progress {
   }
   &::-moz-progress-bar {
     background: url(/images/progress.png) repeat-x;
-    background-size: auto 12px;
+    background-size: auto 13px;
     position: relative;
 
     &:after {
       background: url(/images/nyan.png);
-      background-size: 21px 12px;
+      background-size: 21px 13px;
       position: absolute;
       display: block;
       right: -10px;
-      height: 12px;
+      height: 13px;
       width: 21px;
       content: '';
       top: 0;

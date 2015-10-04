@@ -2,6 +2,7 @@ exports.config =
   files:
     javascripts:
       joinTo:
+        'javascripts/test.js': /test/
         'javascripts/app.js': /^app[\\/]/
         'javascripts/vendor.js': /^(vendor|bower_components)[\\/]/
       order:
@@ -29,4 +30,11 @@ exports.config =
         require('cssnext')({browsers: '> 5%'})
         require('cssnano')
       ]
+
+  overrides:
+    production:
+      optimize: true
+      sourceMaps: false
+      plugins: autoReload: enabled: false
+      conventions: ignored: /(test|jade[\\/]runtime.js$)/
 
