@@ -57,7 +57,6 @@ class NyanCat extends FlyingCat
     @sprite.add @trail
     @sprite.visible = false
     @paused = false
-    window.test = @
 
 module.exports =
   init: ->
