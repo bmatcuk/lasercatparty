@@ -176,5 +176,18 @@ progress {
     width: 100%;
     bottom: 0;
   }
+
+  a#start {
+    border: 1px solid white;
+    border-radius: 5px;
+    position: absolute;
+    text-align: center;
+    background: black;
+    padding: 10px;
+    display: none;
+    color: white;
+    width: 100%;
+    bottom: 0;
+  }
 }
 

@@ -110,8 +110,9 @@ begin = ->
         songProgress.style.width = "#{width}px"
     window.addEventListener 'resize', resizeSongProgress
 
-    # startup the jukebox
-    jukebox = new Jukebox songProgress, volume
+    # startup the jukebox - iOS has some issues, so we need to detect that
+    iOS = /iPad|iPhone|iPod/.test navigator.platform
+    jukebox = new Jukebox iOS, songProgress, volume
     runner = (script) ->
       # update the ui
       do markProgress
@@ -149,7 +150,16 @@ begin = ->
         loading.style.display = ''
         playButton.removeEventListener 'click', toggle
         jukebox.loadNext().then runner
-    jukebox.loadNext().then runner
+
+    if iOS
+      startButton = document.getElementById 'start'
+      startButton.style.display = 'block'
+      startButton.addEventListener 'click', (e) ->
+        do e.preventDefault
+        jukebox.loadNext().then runner
+        startButton.style.display = 'none'
+    else
+      jukebox.loadNext().then runner
 
 module.exports = ->
   if document.readyState is 'complete'

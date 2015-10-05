@@ -6,7 +6,7 @@ MUSIC = [
 ]
 
 class Jukebox
-  constructor: (@songProgress, @volume) ->
+  constructor: (@iOS, @songProgress, @volume) ->
     @currentTrack = Math.floor(Math.random() * MUSIC.length)
 
     # handle volume changes
