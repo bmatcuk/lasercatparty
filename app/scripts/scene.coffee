@@ -25,6 +25,9 @@ class Scene
     @frontStationary = new THREE.Scene
     @frontStationaryObjs = []
 
+    # other objects interested in updates
+    @notifyUpdate = []
+
     # ortho camera
     if aspect <= 1.0
       @orthoCamera = new THREE.OrthographicCamera 0 - aspect, aspect, 1.0, -1.0, -1.0, 1.0
@@ -94,6 +97,9 @@ class Scene
     @frontStationaryObjs.push obj
     obj.setScene @frontStationary
 
+  registerForUpdates: (obj) ->
+    @notifyUpdate.push obj
+
   start: ->
     render = (timestamp) =>
       return if @paused
@@ -111,6 +117,7 @@ class Scene
       obj.update?(timestamp) for obj in @midStationaryObjs
       obj.update?(timestamp) for obj in @frontPerspectiveObjs
       obj.update?(timestamp) for obj in @frontStationaryObjs
+      obj.update?(timestamp) for obj in @notifyUpdate
 
       # render
       do @renderer.clear

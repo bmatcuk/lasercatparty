@@ -114,6 +114,7 @@ begin = ->
       # startup the jukebox - iOS has some issues, so we need to detect that
       iOS = /iPad|iPhone|iPod/.test navigator.platform
       jukebox = new Jukebox iOS, songProgress, volume
+      scene.registerForUpdates jukebox
       runner = (script) ->
         # update the ui
         do markProgress

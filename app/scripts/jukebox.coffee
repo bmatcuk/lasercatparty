@@ -55,6 +55,7 @@ class ScriptEvents
 class Jukebox
   constructor: (@iOS, @songProgress, @volume) ->
     @currentTrack = Math.floor(Math.random() * MUSIC.length)
+    @paused = true
 
     # build audio processing pipeline
     @context = new (window.AudioContext || window.webkitAudioContext)()
@@ -79,7 +80,6 @@ class Jukebox
         @songProgress.setAttribute 'max', @audio.duration
       @audio.addEventListener 'timeupdate', =>
         @songProgress.setAttribute 'value', @audio.currentTime
-        @scriptEvents.fireAt @audio.currentTime
 
       @source = @context.createMediaElementSource @audio
       @source.connect @analyser
@@ -129,6 +129,7 @@ class Jukebox
         # TODO: recreate buffer node and start where we left off
       else
         do @audio.play
+      @paused = false
       return @playPromise
 
     @playPromise = new Promise (resolve, reject) =>
@@ -136,6 +137,7 @@ class Jukebox
         # TODO: create buffer node and start playback
       else
         do @audio.play
+      @paused = false
 
       onended = =>
         if @iOS
@@ -157,6 +159,7 @@ class Jukebox
         # TODO: stop playback
       else
         do @audio.pause
+      @paused = true
 
       onunpaused = =>
         if @iOS
@@ -169,6 +172,15 @@ class Jukebox
         # TODO: add listener
       else
         @audio.addEventListener 'play', onunpaused
+
+  update: (timestamp) ->
+    return if @paused
+
+    audioTime = if @iOS
+      # TODO
+    else
+      @audio.currentTime
+    @scriptEvents.fireAt audioTime
 
   getWaveform: ->
     @analyser.getFloatTimeDomainData @timeData
