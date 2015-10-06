@@ -69,6 +69,7 @@ class Jukebox
     @freqData = new Float32Array @analyser.frequencyBinCount
     @timeData = new Float32Array @analyser.fftSize
 
+    @iOS = true if @iOS is false and !@context.createMediaElementSource
     unless @iOS
       # iOS has a MediaElementAudioSourceNode, but it doesn't work. We use an
       # AudioBufferSourceNode instead, but that means the whole file must be
@@ -78,8 +79,6 @@ class Jukebox
       @audio = new Audio
       @audio.addEventListener 'durationchange', =>
         @songProgress.setAttribute 'max', @audio.duration
-      @audio.addEventListener 'timeupdate', =>
-        @songProgress.setAttribute 'value', @audio.currentTime
 
       @source = @context.createMediaElementSource @audio
       @source.connect @analyser
@@ -104,17 +103,23 @@ class Jukebox
     @playPromise = null
     new Promise (resolve, reject) =>
       done = =>
-        if @iOS
-          # TODO: unbind event listener
-        else
-          @audio.removeEventListener 'canplay', done
+        @audio.removeEventListener 'canplay', done unless @iOS
 
         @scriptEvents = new ScriptEvents @
         script = require MUSIC[@currentTrack].script
         resolve new script @scriptEvents
 
+      @paused = true
       if @iOS
-        # TODO: load song via AJAX
+        request = new XMLHttpRequest
+        request.open 'GET', MUSIC[@currentTrack].audio, true
+        request.responseType = 'arraybuffer'
+        request.onload = =>
+          @context.decodeAudioData request.response, (buffer) =>
+            @buffer = buffer
+            @songProgress.setAttribute 'max', @buffer.duration
+            do done
+        do request.send
       else
         @audio.src = MUSIC[@currentTrack].audio
         if @audio.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA
@@ -122,65 +127,67 @@ class Jukebox
         else
           @audio.addEventListener 'canplay', done
 
+  playBuffer: ->
+    if @paused is true
+      @startedBuffer = @context.currentTime
+      offset = 0
+    else
+      @startedBuffer += @context.currentTime - @paused
+      offset = @context.currentTime - @startedBuffer
+    @bufferNode = do @context.createBufferSource
+    @bufferNode.buffer = @buffer
+    @bufferNode.connect @analyser
+    @bufferNode.start 0, offset
+    @bufferNode.onended = =>
+      unless @paused
+        do @resolvePlay
+        @resolvePlay = null
+      @bufferNode = null
+
   play: ->
     if @playPromise
       # promise is already created, so just restart playback
       if @iOS
-        # TODO: recreate buffer node and start where we left off
+        do @playBuffer
       else
         do @audio.play
       @paused = false
+      do @onunpaused
+      @onunpaused = null
       return @playPromise
 
     @playPromise = new Promise (resolve, reject) =>
       if @iOS
-        # TODO: create buffer node and start playback
+        do @playBuffer
       else
         do @audio.play
       @paused = false
 
       onended = =>
-        if @iOS
-          # TODO: remove event listener
-        else
-          @audio.removeEventListener 'ended', onended
-
+        @audio.removeEventListener 'ended', onended unless @iOS
         @playPromise = null
         do resolve
 
       if @iOS
-        # TODO: add event listener
+        @resolvePlay = onended
       else
         @audio.addEventListener 'ended', onended
 
   pause: ->
     new Promise (resolve, reject) =>
+      @paused = @context.currentTime
       if @iOS
-        # TODO: stop playback
+        @bufferNode.stop 0
+        @bufferNode = null
       else
         do @audio.pause
-      @paused = true
-
-      onunpaused = =>
-        if @iOS
-          # TODO: remove listener
-        else
-          @audio.removeEventListener 'play', onunpaused
-        do resolve
-
-      if @iOS
-        # TODO: add listener
-      else
-        @audio.addEventListener 'play', onunpaused
+      @onunpaused = resolve
 
   update: (timestamp) ->
     return if @paused
-
-    audioTime = if @iOS
-      # TODO
-    else
-      @audio.currentTime
-    @scriptEvents.fireAt audioTime
+    t = do @getCurrentTime
+    @songProgress.setAttribute 'value', t
+    @scriptEvents.fireAt t
 
   getWaveform: ->
     @analyser.getFloatTimeDomainData @timeData
@@ -192,15 +199,11 @@ class Jukebox
 
   getCurrentTime: ->
     if @iOS
-      # TODO
+      @context.currentTime - @startedBuffer
     else
       @audio.currentTime
 
-  getDuration: ->
-    if @iOS
-      # TODO
-    else
-      @audio.duration
+  getDuration: -> if @iOS then @buffer.duration else @audio.duration
 
 module.exports = Jukebox
 

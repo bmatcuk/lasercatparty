@@ -20,6 +20,9 @@ rndi = (min, max) ->
   Math.floor rnd min, max
 
 begin = ->
+  # iOS has a few issues, so we need to detect that
+  iOS = /iPad|iPhone|iPod/.test navigator.platform
+
   # color scale
   colorScale = chroma.scale(['hsl(0,90%,50%)', 'hsl(180,90%,50%)', 'hsl(350,90%,50%)']).mode('hsl')
 
@@ -52,13 +55,14 @@ begin = ->
 
       # add background and background cat to scene
       spectrum = new SpectrumAnalyzer colorScale
-      waveform = new Waveform
       scene.addBackgroundObj background
       scene.addBackgroundObj spectrum
-      scene.addBackgroundObj waveform
       scene.addBackgroundObj backgroundcat
       scene.addMidStationaryObj leftpaw
       scene.addMidStationaryObj rightpaw
+      unless iOS
+        waveform = new Waveform
+        scene.addBackgroundObj waveform
 
       # dance floor
       danceFloor = new DanceFloor colorScale
@@ -112,7 +116,6 @@ begin = ->
       window.addEventListener 'resize', resizeSongProgress
 
       # startup the jukebox - iOS has some issues, so we need to detect that
-      iOS = /iPad|iPhone|iPod/.test navigator.platform
       jukebox = new Jukebox iOS, songProgress, volume
       scene.registerForUpdates jukebox
       runner = (script) ->
@@ -154,12 +157,13 @@ begin = ->
           jukebox.loadNext().then runner
 
       if iOS
-        startButton = document.getElementById 'start'
-        startButton.style.display = 'block'
-        startButton.addEventListener 'click', (e) ->
-          do e.preventDefault
-          jukebox.loadNext().then runner
-          startButton.style.display = 'none'
+        jukebox.loadNext().then (script) ->
+          startButton = document.getElementById 'start'
+          startButton.style.display = 'block'
+          startButton.addEventListener 'click', (e) ->
+            do e.preventDefault
+            startButton.style.display = 'none'
+            runner script
       else
         jukebox.loadNext().then runner
 
