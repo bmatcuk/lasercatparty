@@ -1,33 +1,46 @@
 "use strict"
 
 class AbstractScript
-  constructor: (@dancer) ->
+  constructor: (@registrar) ->
 
   run: (@objs) ->
-    @dancer.after 0, ->
+    @registrar.after 0, ->
       objs.waveform.updateWaveform(@getWaveform())
       objs.spectrum.updateSpectrum(@getSpectrum())
 
-    @dancer.onceAt 0, =>
-      queueNyan = (nyan) =>
-        do nyan.hide
-        t = @dancer.audio.currentTime + Math.random() * 5.0
-        if t + 2 < @dancer.audio.duration
-          @dancer.onceAt t, ->
-            y = Math.random() * 0.8 - 0.4
-            do nyan.show
-            nyan.set 1.1, y
-            nyan.moveTo(-1.5, y, window.performance.now(), 1500).then queueNyan
+    do (registrar = @registrar) ->
+      registrar.onceAt 0, ->
+        queueNyan = (nyan) =>
+          do nyan.hide
+          t = @getCurrentTime() + Math.random() * 5.0
+          if t + 2 < @getDuration()
+            registrar.onceAt t, ->
+              y = Math.random() * 0.8 - 0.4
+              do nyan.show
+              nyan.set 1.1, y
+              nyan.moveTo(-1.5, y, window.performance.now(), 1500).then queueNyan
 
-      for nyan in @objs.nyans
-        queueNyan nyan
+        for nyan in objs.nyans
+          queueNyan nyan
+
+  nearestBeat: (t, bpm) -> Math.round(t * bpm / 60.0) * 60.0 / bpm
 
   onceAtRandomOnBeat: (min, max, bpm, handler) ->
     beatLength = 60000 / bpm
     min = Math.floor(min * 1000 / beatLength)
     max = Math.ceil(max * 1000 / beatLength)
-    beat = Math.random() * (max - min) + min
-    @dancer.onceAt beat * beatLength / 1000.0, handler
+    beat = Math.round(Math.random() * (max - min) + min)
+    @registrar.onceAt beat * beatLength / 1000.0, handler
+
+  scheduleLasers: (t, stop, bpm) ->
+    beatLength = 60 / bpm
+    turnOff = 0
+    while t < stop
+      turnOff = @nearestBeat(t + (0.5 + Math.random()) * beatLength, bpm) while turnOff <= t
+      if turnOff < stop
+        @registrar.onceAt t, => do @objs.backgroundcat.lasersOn
+        @registrar.onceAt turnOff, => do @objs.backgroundcat.lasersOff
+      t = @nearestBeat(turnOff + (0.5 + Math.random()) * beatLength, bpm)
 
   play: (timestamp) ->
     @objs.background.play timestamp

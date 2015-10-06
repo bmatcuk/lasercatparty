@@ -43,123 +43,127 @@ begin = ->
   # +1 to max for song loading down below
   progress.setAttribute 'max', loaders.length + 1
   Promise.all(loaders).then (things) ->
-    [scene, background, backgroundcat, leftpaw, rightpaw, invisiblebike, muffincat, pizzacat, nyancat] = things
+    try
+      [scene, background, backgroundcat, leftpaw, rightpaw, invisiblebike, muffincat, pizzacat, nyancat] = things
 
-    # add paws to background cat
-    backgroundcat.addLeftPaw leftpaw
-    backgroundcat.addRightPaw rightpaw
+      # add paws to background cat
+      backgroundcat.addLeftPaw leftpaw
+      backgroundcat.addRightPaw rightpaw
 
-    # add background and background cat to scene
-    spectrum = new SpectrumAnalyzer colorScale
-    waveform = new Waveform
-    scene.addBackgroundObj background
-    scene.addBackgroundObj spectrum
-    scene.addBackgroundObj waveform
-    scene.addBackgroundObj backgroundcat
-    scene.addMidStationaryObj leftpaw
-    scene.addMidStationaryObj rightpaw
+      # add background and background cat to scene
+      spectrum = new SpectrumAnalyzer colorScale
+      waveform = new Waveform
+      scene.addBackgroundObj background
+      scene.addBackgroundObj spectrum
+      scene.addBackgroundObj waveform
+      scene.addBackgroundObj backgroundcat
+      scene.addMidStationaryObj leftpaw
+      scene.addMidStationaryObj rightpaw
 
-    # dance floor
-    danceFloor = new DanceFloor colorScale
-    scene.addBackPerspectiveObj danceFloor
+      # dance floor
+      danceFloor = new DanceFloor colorScale
+      scene.addBackPerspectiveObj danceFloor
 
-    # dancers
-    dancePositions = []
-    for i in [0...4]
-      for j in [0...4]
-        dancePositions.push [-400 + 200 * i + rnd(0, 200), -400 + 200 * j + rnd(0, 200)]
-    for i in [0..5]
-      pos = dancePositions.splice(rndi(0, dancePositions.length), 1)[0]
-      bike = invisiblebike.apply null, pos
-      scene.addFrontPerspectiveObj bike
-    for i in [0..5]
-      pos = dancePositions.splice(rndi(0, dancePositions.length), 1)[0]
-      muffin = muffincat.apply null, pos
-      scene.addFrontPerspectiveObj muffin
+      # dancers
+      dancePositions = []
+      for i in [0...4]
+        for j in [0...4]
+          dancePositions.push [-400 + 200 * i + rnd(0, 200), -400 + 200 * j + rnd(0, 200)]
+      for i in [0..5]
+        pos = dancePositions.splice(rndi(0, dancePositions.length), 1)[0]
+        bike = invisiblebike.apply null, pos
+        scene.addFrontPerspectiveObj bike
+      for i in [0..5]
+        pos = dancePositions.splice(rndi(0, dancePositions.length), 1)[0]
+        muffin = muffincat.apply null, pos
+        scene.addFrontPerspectiveObj muffin
 
-    # flying cats
-    nyans = []
-    for i in [0...5]
-      nyan = nyancat -0.75, 0.04 + 0.02 * Math.random()
-      scene.addBackgroundObj nyan
-      nyans.push nyan
-    for i in [0...5]
-      nyan = nyancat -0.75, 0.06 + 0.02 * Math.random()
-      scene.addFrontStationaryObj nyan
-      nyans.push nyan
-    scene.addFrontStationaryObj pizzacat
+      # flying cats
+      nyans = []
+      for i in [0...5]
+        nyan = nyancat -0.75, 0.04 + 0.02 * Math.random()
+        scene.addBackgroundObj nyan
+        nyans.push nyan
+      for i in [0...5]
+        nyan = nyancat -0.75, 0.06 + 0.02 * Math.random()
+        scene.addFrontStationaryObj nyan
+        nyans.push nyan
+      scene.addFrontStationaryObj pizzacat
 
-    # start rendering
-    do scene.start
+      # start rendering
+      do scene.start
 
-    # ui elements
-    loading = document.getElementById 'loading'
-    controls = document.getElementById 'controls'
-    playButton = document.getElementById 'button'
-    albumart = document.getElementById 'albumart'
-    link = document.getElementById 'link'
-    artist = document.getElementById 'artist'
-    title = document.getElementById 'title'
-    songProgress = document.getElementById 'song-progress'
-    volume = document.getElementById 'volume'
+      # ui elements
+      loading = document.getElementById 'loading'
+      controls = document.getElementById 'controls'
+      playButton = document.getElementById 'button'
+      albumart = document.getElementById 'albumart'
+      link = document.getElementById 'link'
+      artist = document.getElementById 'artist'
+      title = document.getElementById 'title'
+      songProgress = document.getElementById 'song-progress'
+      volume = document.getElementById 'volume'
 
-    # size of the songProgress bar
-    resizeSongProgress = ->
-      if controls.style.display is 'block'
-        width = controls.offsetWidth - (link.offsetLeft + link.offsetWidth) - (volume.offsetWidth + 40) - 40
-        songProgress.style.width = "#{width}px"
-    window.addEventListener 'resize', resizeSongProgress
+      # size of the songProgress bar
+      resizeSongProgress = ->
+        if controls.style.display is 'block'
+          width = controls.offsetWidth - (link.offsetLeft + link.offsetWidth) - (volume.offsetWidth + 40) - 40
+          songProgress.style.width = "#{width}px"
+      window.addEventListener 'resize', resizeSongProgress
 
-    # startup the jukebox - iOS has some issues, so we need to detect that
-    iOS = /iPad|iPhone|iPod/.test navigator.platform
-    jukebox = new Jukebox iOS, songProgress, volume
-    runner = (script) ->
-      # update the ui
-      do markProgress
-      albumart.setAttribute 'src', script.image
-      link.setAttribute 'href', script.url
-      artist.textContent = script.artist
-      title.textContent = script.title
-      controls.style.display = 'block'
-      loading.style.display = 'none'
-      do resizeSongProgress
+      # startup the jukebox - iOS has some issues, so we need to detect that
+      iOS = /iPad|iPhone|iPod/.test navigator.platform
+      jukebox = new Jukebox iOS, songProgress, volume
+      runner = (script) ->
+        # update the ui
+        do markProgress
+        albumart.setAttribute 'src', script.image
+        link.setAttribute 'href', script.url
+        artist.textContent = script.artist
+        title.textContent = script.title
+        controls.style.display = 'block'
+        loading.style.display = 'none'
+        do resizeSongProgress
 
-      toggle = (e) ->
-        do e.preventDefault
-        if playButton.classList.toggle 'pause'
-          do jukebox.play
-        else
-          script.pause window.performance.now()
-          jukebox.pause().then -> script.play window.performance.now()
-        playButton.classList.toggle 'play'
-      playButton.addEventListener 'click', toggle
+        toggle = (e) ->
+          do e.preventDefault
+          if playButton.classList.toggle 'pause'
+            do jukebox.play
+          else
+            script.pause window.performance.now()
+            jukebox.pause().then -> script.play window.performance.now()
+          playButton.classList.toggle 'play'
+        playButton.addEventListener 'click', toggle
 
-      script.run
-        scene: scene
-        background: background
-        backgroundcat: backgroundcat
-        danceFloor: danceFloor
-        spectrum: spectrum
-        waveform: waveform
-        nyans: nyans
-        pizzacat: pizzacat
-      jukebox.play().then ->
-        # set progress back one because we need to load a new song
-        progress.setAttribute 'value', +progress.getAttribute('value') - 1
-        controls.style.display = 'none'
-        loading.style.display = ''
-        playButton.removeEventListener 'click', toggle
+        script.run
+          scene: scene
+          background: background
+          backgroundcat: backgroundcat
+          danceFloor: danceFloor
+          spectrum: spectrum
+          waveform: waveform
+          nyans: nyans
+          pizzacat: pizzacat
+        jukebox.play().then ->
+          # set progress back one because we need to load a new song
+          progress.setAttribute 'value', +progress.getAttribute('value') - 1
+          controls.style.display = 'none'
+          loading.style.display = ''
+          playButton.removeEventListener 'click', toggle
+          jukebox.loadNext().then runner
+
+      if iOS
+        startButton = document.getElementById 'start'
+        startButton.style.display = 'block'
+        startButton.addEventListener 'click', (e) ->
+          do e.preventDefault
+          jukebox.loadNext().then runner
+          startButton.style.display = 'none'
+      else
         jukebox.loadNext().then runner
 
-    if iOS
-      startButton = document.getElementById 'start'
-      startButton.style.display = 'block'
-      startButton.addEventListener 'click', (e) ->
-        do e.preventDefault
-        jukebox.loadNext().then runner
-        startButton.style.display = 'none'
-    else
-      jukebox.loadNext().then runner
+    catch e
+      console.log e.stack
 
 module.exports = ->
   if document.readyState is 'complete'

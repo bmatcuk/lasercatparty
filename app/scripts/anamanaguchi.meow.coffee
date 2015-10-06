@@ -11,16 +11,7 @@ class Script extends AbstractScript
   run: (objs) ->
     super objs
 
-    kickCount = 0
-    kick = @dancer.createKick
-      onKick: ->
-        do objs.backgroundcat.lasersOn if kickCount is 0
-        kickCount = (kickCount + 1) & 0x03
-
-      offKick: ->
-        do objs.backgroundcat.lasersOff if kickCount is 3
-
-    @dancer.onceAt 0, ->
+    @registrar.onceAt 0, ->
       do objs.pizzacat.show
       objs.pizzacat.set -1.1, -0.1
       objs.pizzacat.moveTo(0, -0.1, window.performance.now(), 2400, 'easeout').then ->
@@ -28,9 +19,11 @@ class Script extends AbstractScript
           objs.pizzacat.moveTo(1.1, -0.1, window.performance.now(), 2400, 'easein').then ->
             do objs.pizzacat.hide
 
-    @dancer.onceAt 3.14, -> objs.background.show window.performance.now(), 7000
+    @scheduleLasers 3.14, 212, 100
 
-    @dancer.onceAt 10.7, ->
+    @registrar.onceAt 3.14, -> objs.background.show window.performance.now(), 7000
+
+    @registrar.onceAt 10.7, ->
       now = window.performance.now()
       objs.danceFloor.show now
       objs.danceFloor.startAnimation now, 100
@@ -38,12 +31,11 @@ class Script extends AbstractScript
       objs.spectrum.startAnimation now, 100
       objs.backgroundcat.show now
       objs.backgroundcat.startAnimation now, 100
-      do kick.on
       for obj in objs.scene.frontPerspectiveObjs
         obj.show now
         obj.startAnimation now, 100
 
-    @dancer.onceAt 212, ->
+    @registrar.onceAt 212, ->
       do objs.spectrum.stopAnimation
       do objs.spectrum.hide
 
@@ -51,10 +43,9 @@ class Script extends AbstractScript
       objs.danceFloor.hide now, 2400
       objs.backgroundcat.hide now, 2400
       do objs.backgroundcat.stopAnimation
-      do kick.off
       obj.hide now, 2400 for obj in objs.scene.frontPerspectiveObjs
 
-    @dancer.onceAt 214.4, ->
+    @registrar.onceAt 214.4, ->
       do objs.danceFloor.stopAnimation
       do obj.stopAnimation for obj in objs.scene.frontPerspectiveObjs
       objs.background.hide window.performance.now(), 7000
