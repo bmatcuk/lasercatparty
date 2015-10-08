@@ -8,6 +8,7 @@ class Dancer
     @sprite.position.z = z
     #@sprite.position.y = 10
     @sprite.scale.x = @sprite.scale.y = @sprite.scale.z = 200
+    @sprite.scale.x *= @texture.image.width / @texture.image.height
     @sprite.visible = false
     @sprite.scale.x = 0 - @sprite.scale.x if Math.random() > 0.5
     @paused = false

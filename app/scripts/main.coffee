@@ -11,6 +11,8 @@ leftpaw = require 'scripts/leftpaw'
 rightpaw = require 'scripts/rightpaw'
 invisiblebike = require 'scripts/invisiblebike'
 muffincat = require 'scripts/muffincat'
+jazzcat = require 'scripts/jazz'
+pitacat = require 'scripts/pita'
 pizzacat = require 'scripts/pizzacat'
 nyancat = require 'scripts/nyancat'
 
@@ -39,6 +41,8 @@ begin = ->
     rightpaw.init().then markProgress
     invisiblebike.init().then markProgress
     muffincat.init().then markProgress
+    jazzcat.init().then markProgress
+    pitacat.init().then markProgress
     pizzacat.init().then markProgress
     nyancat.init().then markProgress
   ]
@@ -47,7 +51,7 @@ begin = ->
   progress.setAttribute 'max', loaders.length + 1
   Promise.all(loaders).then (things) ->
     try
-      [scene, background, backgroundcat, leftpaw, rightpaw, invisiblebike, muffincat, pizzacat, nyancat] = things
+      [scene, background, backgroundcat, leftpaw, rightpaw, invisiblebike, muffincat, jazzcat, pitacat, pizzacat, nyancat] = things
 
       # add paws to background cat
       backgroundcat.addLeftPaw leftpaw
@@ -72,15 +76,23 @@ begin = ->
       dancePositions = []
       for i in [0...4]
         for j in [0...4]
-          dancePositions.push [-400 + 200 * i + rnd(0, 200), -400 + 200 * j + rnd(0, 200)]
-      for i in [0..5]
+          dancePositions.push [-400 + 200 * i + rnd(20, 180), -400 + 200 * j + rnd(20, 180)]
+      for i in [0..2]
         pos = dancePositions.splice(rndi(0, dancePositions.length), 1)[0]
         bike = invisiblebike.apply null, pos
         scene.addFrontPerspectiveObj bike
-      for i in [0..5]
+      for i in [0..2]
         pos = dancePositions.splice(rndi(0, dancePositions.length), 1)[0]
         muffin = muffincat.apply null, pos
         scene.addFrontPerspectiveObj muffin
+      for i in [0..2]
+        pos = dancePositions.splice(rndi(0, dancePositions.length), 1)[0]
+        jazz = jazzcat.apply null, pos
+        scene.addFrontPerspectiveObj jazz
+      for i in [0..2]
+        pos = dancePositions.splice(rndi(0, dancePositions.length), 1)[0]
+        pita = pitacat.apply null, pos
+        scene.addFrontPerspectiveObj pita
 
       # flying cats
       nyans = []
