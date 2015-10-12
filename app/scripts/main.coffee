@@ -7,8 +7,6 @@ Waveform = require 'scripts/waveform'
 DanceFloor = require 'scripts/dance_floor'
 SpectrumAnalyzer = require 'scripts/spectrum'
 backgroundcat = require 'scripts/backgroundcat'
-leftpaw = require 'scripts/leftpaw'
-rightpaw = require 'scripts/rightpaw'
 invisiblebike = require 'scripts/invisiblebike'
 muffincat = require 'scripts/muffincat'
 jazzcat = require 'scripts/jazz'
@@ -37,8 +35,6 @@ begin = ->
     scene.init(document.getElementById 'container').then markProgress
     background.loadRandom().then markProgress
     backgroundcat.init(colorScale).then markProgress
-    leftpaw.init().then markProgress
-    rightpaw.init().then markProgress
     invisiblebike.init().then markProgress
     muffincat.init().then markProgress
     jazzcat.init().then markProgress
@@ -51,19 +47,14 @@ begin = ->
   progress.setAttribute 'max', loaders.length + 1
   Promise.all(loaders).then (things) ->
     try
-      [scene, background, backgroundcat, leftpaw, rightpaw, invisiblebike, muffincat, jazzcat, pitacat, pizzacat, nyancat] = things
-
-      # add paws to background cat
-      backgroundcat.addLeftPaw leftpaw
-      backgroundcat.addRightPaw rightpaw
+      [scene, background, backgroundcat, invisiblebike, muffincat, jazzcat, pitacat, pizzacat, nyancat] = things
 
       # add background and background cat to scene
       spectrum = new SpectrumAnalyzer colorScale
       scene.addBackgroundObj background
       scene.addBackgroundObj spectrum
       scene.addBackgroundObj backgroundcat
-      scene.addMidStationaryObj leftpaw
-      scene.addMidStationaryObj rightpaw
+      scene.addMidStationaryObj backgroundcat.paws
       unless iOS
         waveform = new Waveform
         scene.addBackgroundObj waveform

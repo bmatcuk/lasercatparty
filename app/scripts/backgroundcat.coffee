@@ -1,7 +1,102 @@
 "use strict"
 
+class Paw
+  # posX and posY are the distance, in pixels, from the middle of backgroundcat
+  # to the upper left corner of the paw. Negative values indicate the upper
+  # left corner is to the left (x) or above (y) the center of backgroundcat.
+  #
+  # jointX and jointY are the distance, in pixels, from the top left of the paw
+  # to the point of articulation. These values will always be positive unless
+  # the point of articulation falls up and/or left of the actual paw itself.
+  constructor: (@texture, container, posX, posY, jointX, jointY, widthFactor, heightFactor) ->
+    width = @texture.image.width * widthFactor
+    height = @texture.image.height * heightFactor
+    @geometry = new THREE.PlaneBufferGeometry width, height
+    @material = new THREE.MeshBasicMaterial map: @texture, transparent: true
+    @plane = new THREE.Mesh @geometry, @material
+    @plane.position.x = width / 2.0 - jointX * widthFactor
+    @plane.position.y = height / -2.0 + jointY * heightFactor
+
+    @joint = new THREE.Object3D
+    @joint.add @plane
+    @joint.position.x = (jointX + posX) * widthFactor
+    @joint.position.y = (posY + jointY) * heightFactor * -1.0
+    container.add @joint
+
+    @joint.visible = false
+    @paused = false
+
+  show: ->
+    @joint.visible = true
+
+  hide: (timestamp, fadeout) ->
+    if fadeout?
+      @material.opacity = 1
+      @fadeout =
+        start: timestamp
+        length: fadeout
+    else
+      @joint.visible = false
+
+  play: (timestamp) ->
+    @fadeout.start += timestamp - @paused if @fadeout?
+    @paused = false
+
+  pause: (timestamp) ->
+    @paused = timestamp
+
+  update: (timestamp) ->
+    if @fadeout? and !@paused
+      if timestamp >= @fadeout.start + @fadeout.length
+        @joint.visible = false
+        @material.opacity = 1
+        @fadeout = null
+      else
+        @material.opacity = (@fadeout.length - timestamp + @fadeout.start) / @fadeout.length
+
+class LeftPaw extends Paw
+  constructor: (texture, container, widthFactor, heightFactor) ->
+    super texture, container, -221.0, 33.0, 110.0, 18.0, widthFactor, heightFactor
+
+class RightPaw extends Paw
+  constructor: (texture, container, widthFactor, heightFactor) ->
+    super texture, container, 111.0, 33.0, 14.0, 14.0, widthFactor, heightFactor
+
+class Paws
+  constructor: (leftPawTexture, rightPawTexture, widthFactor, heightFactor) ->
+    @container = new THREE.Object3D
+    @leftPaw = new LeftPaw leftPawTexture, @container, widthFactor, heightFactor
+    @rightPaw = new RightPaw rightPawTexture, @container, widthFactor, heightFactor
+
+  setScene: (scene) ->
+    scene.add @container
+
+  show: ->
+    do @leftPaw.show
+    do @rightPaw.show
+
+  hide: (timestamp, fadeout) ->
+    @leftPaw.hide timestamp, fadeout
+    @rightPaw.hide timestamp, fadeout
+
+  resizeFromCat: (y, scale) ->
+    @container.position.y = y
+    @container.scale.x = @container.scale.y = scale
+
+  play: (timestamp) ->
+    @leftPaw.play timestamp
+    @rightPaw.play timestamp
+
+  pause: (timestamp) ->
+    @leftPaw.pause timestamp
+    @rightPaw.pause timestamp
+
+  update: (timestamp) ->
+    @leftPaw.update timestamp
+    @rightPaw.update timestamp
+
 class BackgroundCat
-  constructor: (@texture, @colorScale) ->
+  constructor: (@texture, leftPawTexture, rightPawTexture, @colorScale) ->
     # calculate width and height
     aspect = @texture.image.width / @texture.image.height
     [width, height] = if aspect > 1.0 then [2.0, 2.0 / aspect] else [2.0 * aspect, 2.0]
@@ -33,6 +128,8 @@ class BackgroundCat
     rightLaser.rotateOnAxis new THREE.Vector3(0.0, 0.0, 1,0), laserRotation
     @lasers.add rightLaser
 
+    @paws = new Paws leftPawTexture, rightPawTexture, width / @texture.image.width, height / @texture.image.height
+
     @paused = false
 
   setScene: (scene) ->
@@ -41,12 +138,10 @@ class BackgroundCat
 
   show: ->
     @plane.visible = true
-    do @leftPaw.show
-    do @rightPaw.show
+    do @paws.show
 
   hide: (timestamp, fadeout) ->
-    @leftPaw.hide timestamp, fadeout
-    @rightPaw.hide timestamp, fadeout
+    @paws.hide timestamp, fadeout
     do @lasersOff
     if fadeout?
       @material.opacity = 1
@@ -69,12 +164,6 @@ class BackgroundCat
   stopAnimation: ->
     @animationStart = null
 
-  addLeftPaw: (paw) ->
-    @leftPaw = paw
-
-  addRightPaw: (paw) ->
-    @rightPaw = paw
-
   resize: (left, top) ->
     width = @geometry.parameters.width / 2.0
     height = @geometry.parameters.height / 2.0
@@ -85,27 +174,16 @@ class BackgroundCat
     @lasers.position.y = @plane.position.y
     @lasers.scale.x = @lasers.scale.y = scale
 
-    cat =
-      position: @plane.position
-      geometry:
-        width: width
-        height: height
-      image:
-        width: @texture.image.width
-        height: @texture.image.height
-    @leftPaw?.catResize cat, scale
-    @rightPaw?.catResize cat, scale
+    @paws.resizeFromCat @plane.position.y, scale
 
   play: (timestamp) ->
-    @leftPaw.play timestamp
-    @rightPaw.play timestamp
+    @paws.play timestamp
     @animationStart += timestamp - @paused if @animationStart?
     @fadeout.start += timestamp - @paused if @fadeout?
     @paused = false
 
   pause: (timestamp) ->
-    @leftPaw.pause timestamp
-    @rightPaw.pause timestamp
+    @paws.pause timestamp
     @paused = timestamp
 
   update: (timestamp) ->
@@ -125,7 +203,21 @@ class BackgroundCat
 module.exports =
   init: (colorScale) ->
     new Promise (resolve, reject) ->
-      texture = THREE.ImageUtils.loadTexture "/images/backgroundcat.png", THREE.UVMapping, ->
-        texture.minFilter = THREE.NearestFilter
-        resolve new BackgroundCat texture, colorScale
+      textures = [
+        new Promise (resolveTexture, rejectTexture) ->
+          texture = THREE.ImageUtils.loadTexture "/images/backgroundcat.png", THREE.UVMapping, ->
+            texture.minFilter = THREE.NearestFilter
+            resolveTexture texture
+        new Promise (resolveTexture, rejectTexture) ->
+          texture = THREE.ImageUtils.loadTexture "/images/leftpaw.png", THREE.UVMapping, ->
+            texture.minFilter = THREE.NearestFilter
+            resolveTexture texture
+        new Promise (resolveTexture, rejectTexture) ->
+          texture = THREE.ImageUtils.loadTexture "/images/rightpaw.png", THREE.UVMapping, ->
+            texture.minFilter = THREE.NearestFilter
+            resolveTexture texture
+      ]
+      Promise.all(textures).then (textures) ->
+        [catTexture, leftPawTexture, rightPawTexture] = textures
+        resolve new BackgroundCat catTexture, leftPawTexture, rightPawTexture, colorScale
 
