@@ -61,6 +61,30 @@ class LeftPaw extends Paw
 class RightPaw extends Paw
   constructor: (texture, container, widthFactor, heightFactor) ->
     super texture, container, 111.0, 33.0, 14.0, 14.0, widthFactor, heightFactor
+    window.test = @joint
+
+  handleClick: (timestamp, beatLength) ->
+    return if @smash?
+    @smash =
+      timestamp: timestamp
+      length: beatLength
+
+  update: (timestamp) ->
+    super
+    if @smash? and !@paused
+      quaternion = new THREE.Quaternion
+      progress = 0
+      if timestamp >= @smash.timestamp + @smash.length
+        @smash = null
+      else
+        progress = (timestamp - @smash.timestamp) / @smash.length
+        if progress >= 0.75
+          progress = (1.0 - progress) / 0.25
+        else
+          progress = Math.sin(progress / 0.75 * Math.PI / 2.0)
+
+      quaternion.setFromAxisAngle(new THREE.Vector3(0, 0, 1), progress * 0.5)
+      @joint.quaternion.copy quaternion
 
 class Paws
   constructor: (leftPawTexture, rightPawTexture, widthFactor, heightFactor) ->
@@ -82,6 +106,9 @@ class Paws
   resizeFromCat: (y, scale) ->
     @container.position.y = y
     @container.scale.x = @container.scale.y = scale
+
+  handleClickFromCat: (timestamp, beatLength) ->
+    @rightPaw.handleClick timestamp, beatLength
 
   play: (timestamp) ->
     @leftPaw.play timestamp
@@ -156,6 +183,9 @@ class BackgroundCat
 
   lasersOff: ->
     @lasers.visible = false
+
+  handleClick: (timestamp) ->
+    @paws.handleClickFromCat timestamp, @beatLength if @beatLength
 
   startAnimation: (timestamp, bpm) ->
     @animationStart = timestamp

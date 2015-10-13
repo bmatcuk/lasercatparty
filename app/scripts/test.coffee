@@ -26,6 +26,8 @@ begin = ->
 
     do scene.start
 
+    backgroundcat.startAnimation window.performance.now(), 100
+
 module.exports = ->
   if document.readyState is 'complete'
     do begin

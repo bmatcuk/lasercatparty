@@ -25,8 +25,11 @@ class Scene
     @frontStationary = new THREE.Scene
     @frontStationaryObjs = []
 
-    # other objects interested in updates
+    # objects interested in updates
     @notifyUpdate = []
+
+    # objects interested in click events
+    @clickHandlers = []
 
     # ortho camera
     if aspect <= 1.0
@@ -77,28 +80,39 @@ class Scene
 
   addBackgroundObj: (obj) ->
     @backgroundObjs.push obj
+    @notifyUpdate.push obj if obj.update?
+    @clickHandlers.push obj if obj.handleClick?
     obj.resize? @orthoCamera.right, @orthoCamera.top
     obj.setScene @background
 
   addBackPerspectiveObj: (obj) ->
     @backPerspectiveObjs.push obj
+    @notifyUpdate.push obj if obj.update?
+    @clickHandlers.push obj if obj.handleClick?
     obj.setScene @backPerspective
 
   addMidStationaryObj: (obj) ->
     @midStationaryObjs.push obj
+    @notifyUpdate.push obj if obj.update?
+    @clickHandlers.push obj if obj.handleClick?
     obj.resize? @orthoCamera.right, @orthoCamera.top
     obj.setScene @midStationary
 
   addFrontPerspectiveObj: (obj) ->
     @frontPerspectiveObjs.push obj
+    @notifyUpdate.push obj if obj.update?
+    @clickHandlers.push obj if obj.handleClick?
     obj.setScene @frontPerspective
 
   addFrontStationaryObj: (obj) ->
     @frontStationaryObjs.push obj
+    @notifyUpdate.push obj if obj.update?
+    @clickHandlers.push obj if obj.handleClick?
     obj.setScene @frontStationary
 
   registerForUpdates: (obj) ->
     @notifyUpdate.push obj
+    @clickHandlers.push obj if obj.handleClick?
 
   start: ->
     render = (timestamp) =>
@@ -112,12 +126,7 @@ class Scene
       @perspectiveCamera.lookAt LOOKAT
 
       # update
-      obj.update?(timestamp) for obj in @backgroundObjs
-      obj.update?(timestamp) for obj in @backPerspectiveObjs
-      obj.update?(timestamp) for obj in @midStationaryObjs
-      obj.update?(timestamp) for obj in @frontPerspectiveObjs
-      obj.update?(timestamp) for obj in @frontStationaryObjs
-      obj.update?(timestamp) for obj in @notifyUpdate
+      obj.update(timestamp) for obj in @notifyUpdate
 
       # render
       do @renderer.clear
@@ -144,23 +153,33 @@ class Scene
   stopAutoRotate: ->
     @autoRotate = false
 
+  handleClick: ->
+    timestamp = window.performance.now()
+    obj.handleClick(timestamp) for obj in @clickHandlers
+
 module.exports =
   init: (parent) ->
     scene = new Scene parent
 
     autoRotateTimeout = null
     mousedown = (e) ->
-      if autoRotateTimeout?
-        clearTimeout autoRotateTimeout
-        autoRotateTimeout = null
-      do scene.stopAutoRotate
-
-      x = e.clientX
+      startX = x = e.clientX
+      manualRotate = false
       mousemove = (e) ->
-        scene.manualRotate -= (e.clientX - x) * 0.01
-        x = e.clientX
+        if !manualRotate and Math.abs(e.clientX - startX) > 5
+          if autoRotateTimeout?
+            clearTimeout autoRotateTimeout
+            autoRotateTimeout = null
+          do scene.stopAutoRotate
+          manualRotate = true
+        if manualRotate
+          scene.manualRotate -= (e.clientX - x) * 0.01
+          x = e.clientX
       mouseup = (e) ->
-        autoRotateTimeout = setTimeout((-> scene.startAutoRotate window.performance.now()), 1000)
+        if manualRotate
+          autoRotateTimeout = setTimeout((-> scene.startAutoRotate window.performance.now()), 1000)
+        else
+          do scene.handleClick
         parent.removeEventListener 'mousemove', mousemove
         parent.removeEventListener 'mouseup', mouseup
       parent.addEventListener 'mousemove', mousemove

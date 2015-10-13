@@ -44,9 +44,27 @@ class Dancer
   pause: (timestamp) ->
     @paused = timestamp
 
+  handleClick: (timestamp) ->
+    # delay the jump by a beatLength for the cat smash
+    return if !@beatLength? or @jump?
+    height = Math.random() * 1.5 + 0.5
+    @jump =
+      timestamp: timestamp + @beatLength
+      length: @beatLength * height
+      startY: @sprite.position.y
+      deltaY: height * 50.0
+
   update: (timestamp) ->
     unless @paused
-      if @nextUpdate?
+      if @jump?
+        if timestamp >= @jump.timestamp + @jump.length
+          @sprite.position.y = @jump.startY
+          @jump = null
+        else if timestamp >= @jump.timestamp
+          progress = (timestamp - @jump.timestamp) / @jump.length
+          progress = Math.sin(progress * Math.PI)
+          @sprite.position.y = @jump.deltaY * progress + @jump.startY
+      else if @nextUpdate?
         if @nextUpdate <= timestamp
           @sprite.scale.x = 0 - @sprite.scale.x
           @nextUpdate += @beatLength while @nextUpdate <= timestamp

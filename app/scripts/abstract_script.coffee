@@ -36,11 +36,11 @@ class AbstractScript
     beatLength = 60 / bpm
     turnOff = 0
     while t < stop
-      turnOff = @nearestBeat(t + (0.5 + Math.random()) * beatLength, bpm) while turnOff <= t
+      turnOff = t + (0.1 + Math.random() * 0.4) * beatLength
       if turnOff < stop
         @registrar.onceAt t, => do @objs.backgroundcat.lasersOn
         @registrar.onceAt turnOff, => do @objs.backgroundcat.lasersOff
-      t = @nearestBeat(turnOff + (0.5 + Math.random()) * beatLength, bpm)
+      t = turnOff + (0.1 + Math.random() * 0.4) * beatLength
 
   play: (timestamp) ->
     @objs.background.play timestamp
