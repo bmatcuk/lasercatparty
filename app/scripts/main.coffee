@@ -49,6 +49,11 @@ begin = ->
     try
       [scene, background, backgroundcat, invisiblebike, muffincat, jazzcat, pitacat, pizzacat, nyancat] = things
 
+      # try to hide the navigation bar on iOS
+      if iOS or true
+        document.body.style.paddingTop = '1px'
+        window.scrollTo 0, 1
+
       # add background and background cat to scene
       spectrum = new SpectrumAnalyzer colorScale
       scene.addBackgroundObj background
@@ -110,11 +115,35 @@ begin = ->
       title = document.getElementById 'title'
       songProgress = document.getElementById 'song-progress'
       volume = document.getElementById 'volume'
+      fullScreen = document.getElementById 'full-screen'
+      rightControls = document.getElementById 'right-controls'
+
+      # handle full screen
+      if document.fullscreenEnabled or document.mozFullScreenEnabled or document.webkitFullscreenEnabled
+        fullScreen.addEventListener 'click', (e) ->
+          do e.preventDefault
+          if fullScreen.classList.contains 'fa-expand'
+            elem = document.documentElement
+            (elem.requestFullscreen or elem.mozRequestFullScreen or elem.webkitRequestFullscreen).apply elem
+          else
+            (document.exitFullscreen or document.mozCancelFullScreen or document.webkitExitFullscreen).apply document
+        fullscreenToggled = ->
+          fullScreen.classList.toggle 'fa-compress'
+          fullScreen.classList.toggle 'fa-expand'
+        if typeof document.onfullscreenchange isnt 'undefined'
+          document.addEventListener 'fullscreenchange', fullscreenToggled
+        else if typeof document.onmozfullscreenchange isnt 'undefined'
+          document.addEventListener 'mozfullscreenchange', fullscreenToggled
+        else if typeof document.onwebkitfullscreenchange isnt 'undefined'
+          document.addEventListener 'webkitfullscreenchange', fullscreenToggled
+      else
+        fullScreen.style.display = 'none'
+        fullScreen = null
 
       # size of the songProgress bar
       resizeSongProgress = ->
         if controls.style.display is 'block'
-          width = controls.offsetWidth - (link.offsetLeft + link.offsetWidth) - (volume.offsetWidth + 40) - 40
+          width = controls.offsetWidth - (link.offsetLeft + link.offsetWidth) - rightControls.offsetWidth - 40
           songProgress.style.width = "#{width}px"
       window.addEventListener 'resize', resizeSongProgress
 

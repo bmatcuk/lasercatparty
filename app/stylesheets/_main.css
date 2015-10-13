@@ -85,38 +85,25 @@ progress {
   &:before, &:after { content: ' '; display: table; }
   &:after { clear: both; }
 
+  a { text-decoration: none; color: var(--text); }
+
   a#button {
     border: 1px solid var(--text);
     border-radius: 25px;
     position: relative;
     margin-left: 10px;
+    font-size: 20px;
     display: block;
     height: 40px;
     width: 40px;
     float: left;
 
-    &:after {
-      box-sizing: border-box;
+    &:before {
       position: absolute;
-      display: block;
-      content: ' ';
-      height: 14px;
-      width: 14px;
-      left: 13px;
-      top: 13px;
+      top: 10px;
     }
-    &.pause:after {
-      border-color: var(--text);
-      border-width: 0 5px 0;
-      border-style: solid;
-    }
-    &.play:after {
-      border-color: transparent transparent transparent var(--text);
-      border-width: 8px 14px;
-      border-style: solid;
-      width: 28px;
-      left: 15px;
-    }
+    &.pause:before { content: "\f04c"; left: 11px; }
+    &.play:before { content: "\f04b"; left: 14px; }
   }
 
   img#albumart {
@@ -128,8 +115,6 @@ progress {
   }
 
   a#link {
-    text-decoration: none;
-    color: var(--text);
     margin-left: 10px;
     display: block;
     float: left;
@@ -145,7 +130,6 @@ progress {
 
     &#volume {
       margin-right: 20px;
-      float: right;
       width: 100px;
 
       cursor: move;
@@ -159,6 +143,18 @@ progress {
         cursor: -webkit-grabbing;
       }
     }
+  }
+
+  #right-controls {
+    float: right;
+    &:before, &:after { content: ' '; display: table; }
+    &:after { clear: both; }
+  }
+
+  a#full-screen {
+    margin-right: 10px;
+    line-height: 40px;
+    float: left;
   }
 }
 

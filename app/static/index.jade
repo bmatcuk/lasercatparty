@@ -15,6 +15,7 @@ html
 
     meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1')/
 
+    link(rel="stylesheet", type="text/css", href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css")
     link(rel="stylesheet", type="text/css", href="/stylesheets/app.css")
     script(type="text/javascript", src="/javascripts/vendor.js")
     script(type="text/javascript", src="/javascripts/app.js")
@@ -22,14 +23,16 @@ html
   body
     #container
     #controls
-      a#button.pause(href="#")
+      a#button.pause.fa(href="#")
       img#albumart()/
       a#link(href="#")
         span#artist
         br/
         span#title
       progress#song-progress(value='0')
-      progress#volume(value='0', max='1')
+      #right-controls
+        progress#volume(value='0', max='1')
+        a#full-screen.fa.fa-expand(href="#")
     #loading
       progress#loading-progress(value='0')
       a#start(href="#") start!
