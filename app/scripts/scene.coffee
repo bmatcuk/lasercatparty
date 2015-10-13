@@ -162,9 +162,10 @@ module.exports =
     scene = new Scene parent
 
     autoRotateTimeout = null
+    detachMouseEvents = null
     mousedown = (e) ->
-      startX = x = e.clientX
       manualRotate = false
+      startX = x = e.clientX
       mousemove = (e) ->
         if !manualRotate and Math.abs(e.clientX - startX) > 5
           if autoRotateTimeout?
@@ -180,11 +181,44 @@ module.exports =
           autoRotateTimeout = setTimeout((-> scene.startAutoRotate window.performance.now()), 1000)
         else
           do scene.handleClick
+        do detachMouseEvents
+      detachMouseEvents = ->
         parent.removeEventListener 'mousemove', mousemove
         parent.removeEventListener 'mouseup', mouseup
+        detachMouseEvents = null
       parent.addEventListener 'mousemove', mousemove
       parent.addEventListener 'mouseup', mouseup
     parent.addEventListener 'mousedown', mousedown
+
+    touchstart = (e) ->
+      return unless e.touches.length is 1
+      manualRotate = false
+      startX = x = e.touches[0].pageX
+      touchmove = (e) ->
+        return unless e.touches.length is 1
+        if !manualRotate and Math.abs(e.touches[0].pageX - startX) > 5
+          if autoRotateTimeout?
+            clearTimeout autoRotateTimeout
+            autoRotateTimeout = null
+          do scene.stopAutoRotate
+          manualRotate = true
+        if manualRotate
+          scene.manualRotate -= (e.touches[0].pageX - x) * 0.01
+          x = e.touches[0].pageX
+      touchend = (e) ->
+        if manualRotate
+          autoRotateTimeout = setTimeout((-> scene.startAutoRotate window.performance.now()), 1000)
+        else
+          do scene.handleClick
+        do detachTouchEvents
+      detachTouchEvents = ->
+        parent.removeEventListener 'touchmove', touchmove
+        parent.removeEventListener 'touchend', touchend
+        detachTouchEvents = null
+      parent.addEventListener 'touchmove', touchmove
+      parent.addEventListener 'touchend', touchend
+      do detachMouseEvents if detachMouseEvents?
+    parent.addEventListener 'touchstart', touchstart
 
     Promise.resolve scene
 
