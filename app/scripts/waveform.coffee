@@ -1,5 +1,8 @@
 "use strict"
 
+# must be a power of 2!
+HISTORY = 8
+
 class Waveform
   constructor: ->
     @canvas = document.createElement 'canvas'
@@ -7,7 +10,7 @@ class Waveform
     @canvas.height = 256
 
     @context = @canvas.getContext '2d'
-    @waveforms = new Array 16
+    @waveforms = new Array HISTORY
     @waveformIdx = 0
 
     @geometry = new THREE.PlaneBufferGeometry 2.0, 1.2
@@ -30,7 +33,7 @@ class Waveform
     wave = @waveforms[@waveformIdx]
     for i in [0..waveform.length]
       wave[i] = 128 - Math.round(waveform[i] * 64)
-    @waveformIdx = (@waveformIdx + 1) & 0x0f
+    @waveformIdx = (@waveformIdx + 1) & (HISTORY - 1)
 
     @context.clearRect 0, 0, 1024, 256
     idx = @waveformIdx
@@ -39,12 +42,12 @@ class Waveform
       continue unless wave
 
       do @context.beginPath
-      @context.strokeStyle = "rgba(255, 255, 255, #{(i * 16 + 15) / 255})"
+      @context.strokeStyle = "rgba(255, 255, 255, #{((i + 1) * 256 / HISTORY - 1) / 255})"
       @context.moveTo 0, @waveforms[idx][0]
       for x in [1...wave.length]
         @context.lineTo x, wave[x]
       do @context.stroke
-      idx = (idx + 1) & 0x0f
+      idx = (idx + 1) & (HISTORY - 1)
 
     @texture.needsUpdate = true
 
