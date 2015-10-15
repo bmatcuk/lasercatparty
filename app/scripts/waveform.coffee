@@ -13,7 +13,7 @@ class Waveform
     @waveforms = new Array HISTORY
     @waveformIdx = 0
 
-    @geometry = new THREE.PlaneBufferGeometry 2.0, 1.2
+    @geometry = new THREE.PlaneBufferGeometry 2.0, 0.8
     @texture = new THREE.Texture @canvas
     @material = new THREE.MeshBasicMaterial map: @texture, transparent: true
     @plane = new THREE.Mesh @geometry, @material
@@ -30,9 +30,7 @@ class Waveform
 
   updateWaveform: (waveform) ->
     @waveforms[@waveformIdx] = new Uint8Array 1024 unless @waveforms[@waveformIdx]?
-    wave = @waveforms[@waveformIdx]
-    for i in [0..waveform.length]
-      wave[i] = 128 - Math.round(waveform[i] * 64)
+    @waveforms[@waveformIdx].set waveform
     @waveformIdx = (@waveformIdx + 1) & (HISTORY - 1)
 
     @context.clearRect 0, 0, 1024, 256

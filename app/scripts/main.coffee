@@ -56,13 +56,12 @@ begin = ->
 
       # add background and background cat to scene
       spectrum = new SpectrumAnalyzer colorScale
+      waveform = new Waveform
       scene.addBackgroundObj background
       scene.addBackgroundObj spectrum
+      scene.addBackgroundObj waveform
       scene.addBackgroundObj backgroundcat
       scene.addMidStationaryObj backgroundcat.paws
-      unless iOS
-        waveform = new Waveform
-        scene.addBackgroundObj waveform
 
       # dance floor
       danceFloor = new DanceFloor colorScale

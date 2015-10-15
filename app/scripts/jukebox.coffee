@@ -67,7 +67,7 @@ class Jukebox
     @analyser.fftSize = 1024
     @analyser.connect @gain
     @freqData = new Float32Array @analyser.frequencyBinCount
-    @timeData = new Float32Array @analyser.fftSize
+    @timeData = new Uint8Array @analyser.fftSize
 
     @iOS = true if @iOS is false and !@context.createMediaElementSource
     unless @iOS
@@ -190,7 +190,7 @@ class Jukebox
     @scriptEvents.fireAt t
 
   getWaveform: ->
-    @analyser.getFloatTimeDomainData @timeData
+    @analyser.getByteTimeDomainData @timeData
     @timeData
 
   getSpectrum: ->

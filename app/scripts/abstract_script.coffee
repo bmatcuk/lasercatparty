@@ -5,7 +5,7 @@ class AbstractScript
 
   run: (@objs) ->
     @registrar.after 0, ->
-      objs.waveform.updateWaveform(@getWaveform()) if objs.waveform
+      objs.waveform.updateWaveform(@getWaveform())
       objs.spectrum.updateSpectrum(@getSpectrum())
 
     do (registrar = @registrar) ->
