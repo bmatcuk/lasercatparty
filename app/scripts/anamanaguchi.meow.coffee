@@ -23,6 +23,9 @@ class Script extends AbstractScript
 
     @registrar.onceAt 3.14, -> objs.background.show window.performance.now(), 7000
 
+    @registrar.onceAt 5.7, ->
+      objs.countdown.start 5, window.performance.now()
+
     @registrar.onceAt 10.7, ->
       now = window.performance.now()
       objs.danceFloor.show now

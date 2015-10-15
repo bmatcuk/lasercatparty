@@ -2,7 +2,6 @@
 
 scene = require 'scripts/scene'
 background = require 'scripts/background'
-backgroundcat = require 'scripts/backgroundcat'
 
 begin = ->
   # color scale
@@ -11,18 +10,18 @@ begin = ->
   loaders = [
     scene.init(document.getElementById('container'))
     do background.loadRandom
-    backgroundcat.init colorScale
   ]
 
   Promise.all(loaders).then (things) ->
-    [scene, background, backgroundcat] = things
+    [scene, background] = things
 
     do background.show
+    background.handleClick = (timestamp) ->
+      scene.removeBackgroundObj background
+      background.loadNext().then ->
+        do background.show
+        scene.addBackgroundObj background
     scene.addBackgroundObj background
-
-    do backgroundcat.show
-    scene.addBackgroundObj backgroundcat
-    scene.addMidStationaryObj backgroundcat.paws
 
     do scene.start
 

@@ -50,6 +50,7 @@ class AbstractScript
     obj.play timestamp for obj in @objs.scene.frontPerspectiveObjs
     obj.play timestamp for obj in @objs.nyans
     @objs.pizzacat.play timestamp
+    @objs.countdown.play timestamp
 
   pause: (timestamp) ->
     @objs.background.pause timestamp
@@ -59,6 +60,7 @@ class AbstractScript
     obj.pause timestamp for obj in @objs.scene.frontPerspectiveObjs
     obj.pause timestamp for obj in @objs.nyans
     @objs.pizzacat.pause timestamp
+    @objs.countdown.pause timestamp
 
 module.exports = AbstractScript
 

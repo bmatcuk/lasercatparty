@@ -19,7 +19,10 @@ html
     link(rel="stylesheet", type="text/css", href="/stylesheets/app.css")
     script(type="text/javascript", src="/javascripts/vendor.js")
     script(type="text/javascript", src="/javascripts/app.js")
-    script(type="text/javascript") require("scripts/main")();
+    script(type="text/javascript", src="//use.typekit.net/aoz0nrn.js")
+    script(type="text/javascript").
+      try{Typekit.load({ async: true });}catch(e){}
+      require("scripts/main")();
   body
     #container
     #controls
@@ -33,6 +36,7 @@ html
       #right-controls
         progress#volume(value='0', max='1')
         a#full-screen.fa.fa-expand(href="#")
+    #countdown
     #loading
       progress#loading-progress(value='0')
       a#start(href="#") start!

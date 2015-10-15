@@ -13,6 +13,7 @@ jazzcat = require 'scripts/jazz'
 pitacat = require 'scripts/pita'
 pizzacat = require 'scripts/pizzacat'
 nyancat = require 'scripts/nyancat'
+Countdown = require 'scripts/countdown'
 
 rnd = (min, max) ->
   Math.random() * (max - min) + min
@@ -25,6 +26,7 @@ begin = ->
 
   # color scale
   colorScale = chroma.scale(['hsl(0,90%,50%)', 'hsl(180,90%,50%)', 'hsl(350,90%,50%)']).mode('hsl')
+  window.test = colorScale
 
   progress = document.getElementById 'loading-progress'
   markProgress = (obj) ->
@@ -91,15 +93,19 @@ begin = ->
 
       # flying cats
       nyans = []
-      for i in [0...5]
+      for i in [0...7]
         nyan = nyancat -0.75, 0.04 + 0.02 * Math.random()
         scene.addBackgroundObj nyan
         nyans.push nyan
-      for i in [0...5]
+      for i in [0...3]
         nyan = nyancat -0.75, 0.06 + 0.02 * Math.random()
         scene.addFrontStationaryObj nyan
         nyans.push nyan
       scene.addFrontStationaryObj pizzacat
+
+      # countdown
+      countdown = new Countdown document.getElementById 'countdown'
+      scene.registerForUpdates countdown
 
       # start rendering
       do scene.start
@@ -179,13 +185,20 @@ begin = ->
           waveform: waveform
           nyans: nyans
           pizzacat: pizzacat
+          countdown: countdown
         jukebox.play().then ->
-          # set progress back one because we need to load a new song
-          progress.setAttribute 'value', +progress.getAttribute('value') - 1
+          # set progress back two because we need to load a new song and background
+          progress.setAttribute 'value', +progress.getAttribute('value') - 2
           controls.style.display = 'none'
           loading.style.display = ''
           playButton.removeEventListener 'click', toggle
-          jukebox.loadNext().then runner
+          scene.removeBackgroundObj background
+          Promise.all([
+            background.loadNext().then(markProgress)
+            do jukebox.loadNext
+          ]).then (things) ->
+            scene.addBackgroundObj background
+            runner things[1]
 
       if iOS
         jukebox.loadNext().then (script) ->

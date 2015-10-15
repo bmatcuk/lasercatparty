@@ -11,15 +11,18 @@ class Script extends AbstractScript
   run: (objs) ->
     super objs
 
-    @registrar.onceAt 0, ->
+    @registrar.onceAt 1.875, ->
       do objs.pizzacat.show
       objs.pizzacat.set -1.1, -0.1
-      objs.pizzacat.moveTo(0, -0.1, window.performance.now(), 7500, 'easeout').then ->
-        objs.pizzacat.hover(0.01, window.performance.now(), 25781, 55).then ->
-          objs.pizzacat.moveTo(1.1, -0.1, window.performance.now(), 7500, 'easein').then ->
+      objs.pizzacat.moveTo(0, -0.1, window.performance.now(), 5625, 'easeout').then ->
+        objs.pizzacat.hover(0.01, window.performance.now(), 27656, 59).then ->
+          objs.pizzacat.moveTo(1.1, -0.1, window.performance.now(), 5000, 'easein').then ->
             do objs.pizzacat.hide
 
     @registrar.onceAt 22.5, -> objs.background.show window.performance.now(), 7500
+
+    @registrar.onceAt 31.1, ->
+      objs.countdown.start 10, window.performance.now()
 
     @scheduleLasers 41.1, 140.6, 128
 

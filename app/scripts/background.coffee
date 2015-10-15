@@ -13,7 +13,11 @@ BACKGROUNDS = [
 ]
 
 class Background
-  constructor: (@texture) ->
+  constructor: (@idx, @texture) ->
+    do @build
+    @paused = false
+
+  build: ->
     # calculate width and height
     aspect = @texture.image.width / @texture.image.height
     [width, height] = if aspect > 1.0 then [2.0 * aspect, 2.0] else [2.0, 2.0 / aspect]
@@ -23,10 +27,27 @@ class Background
     @plane = new THREE.Mesh @geometry, @material
     @plane.position.z = -0.9
     @plane.visible = false
-    @paused = false
 
   setScene: (scene) ->
     scene.add @plane
+
+  removeScene: (scene) ->
+    scene.remove @plane
+
+  loadNext: ->
+    new Promise (resolve, reject) =>
+      @idx = (@idx + 1) % BACKGROUNDS.length
+      img = BACKGROUNDS[@idx]
+      texture = THREE.ImageUtils.loadTexture img.image, THREE.UVMapping, =>
+        texture.minFilter = THREE.NearestFilter
+
+        do @texture.dispose
+        do @geometry.dispose
+        do @material.dispose
+
+        @texture = texture
+        do @build
+        do resolve
 
   show: (timestamp, fadein) ->
     @plane.visible = true
@@ -144,7 +165,7 @@ module.exports =
       texture = THREE.ImageUtils.loadTexture img.image, THREE.UVMapping, ->
         texture.minFilter = THREE.NearestFilter
 
-        background = new Background texture
+        background = new Background idx, texture
         #reflection = new BackgroundReflection texture
         resolve background
 

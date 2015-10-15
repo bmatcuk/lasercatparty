@@ -61,7 +61,6 @@ class LeftPaw extends Paw
 class RightPaw extends Paw
   constructor: (texture, container, widthFactor, heightFactor) ->
     super texture, container, 111.0, 33.0, 14.0, 14.0, widthFactor, heightFactor
-    window.test = @joint
 
   handleClick: (timestamp, beatLength) ->
     return if @smash?

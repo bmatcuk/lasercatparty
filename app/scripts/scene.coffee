@@ -85,6 +85,17 @@ class Scene
     obj.resize? @orthoCamera.right, @orthoCamera.top
     obj.setScene @background
 
+  removeBackgroundObj: (obj) ->
+    idx = @backgroundObjs.indexOf obj
+    @backgroundObjs.splice idx, 1 if idx >= 0
+    if obj.update?
+      idx = @notifyUpdate.indexOf obj
+      @notifyUpdate.splice idx, 1 if idx >= 0
+    if obj.handleClick?
+      idx = @clickHandlers.indexOf obj
+      @clickHandlers.splice idx, 1 if idx >= 0
+    obj.removeScene @background
+
   addBackPerspectiveObj: (obj) ->
     @backPerspectiveObjs.push obj
     @notifyUpdate.push obj if obj.update?
