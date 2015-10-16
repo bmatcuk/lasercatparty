@@ -21,8 +21,8 @@ class Script extends AbstractScript
 
     @registrar.onceAt 22.5, -> objs.background.show window.performance.now(), 7500
 
-    @registrar.onceAt 31.1, ->
-      objs.countdown.start 10, window.performance.now()
+    @registrar.onceAt 29.85, ->
+      objs.countdown.start 12, window.performance.now(), 937.5
 
     @scheduleLasers 41.1, 140.6, 128
 

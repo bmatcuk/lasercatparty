@@ -161,21 +161,21 @@ progress {
 @keyframes countdown {
   0% {
     text-shadow:
-      0 0 0 #f20d0d80,
-      0 0 0 #f28a0d80,
-      0 0 0 #ddf20d80,
-      0 0 0 #60f20d80,
-      0 0 0 #0d41f280,
-      0 0 0 #4f0df280;
+      0 0 0 #f20d0dc0,
+      0 0 0 #f28a0dc0,
+      0 0 0 #ddf20dc0,
+      0 0 0 #60f20dc0,
+      0 0 0 #0d41f2c0,
+      0 0 0 #4f0df2c0;
   }
   100% {
     text-shadow:
-      -10px -10px 5px #f20d0d80,
-      0     -10px 5px #f28a0d80,
-      10px  0     5px #ddf20d80,
-      10px  10px  5px #60f20d80,
-      0     10px  5px #0d41f280,
-      -10px 0     5px #4f0df280;
+      -10px -10px 5px #f20d0dc0,
+      0     -10px 5px #f28a0dc0,
+      10px  0     5px #ddf20dc0,
+      10px  10px  5px #60f20dc0,
+      0     10px  5px #0d41f2c0,
+      -10px 0     5px #4f0df2c0;
   }
 }
 
@@ -184,7 +184,7 @@ progress {
   font-size: 80px;
   display: none;
   left: 50%;
-  top: 50%;
+  top: 80%;
 
   &.animate {
     animation-duration: 1s;
