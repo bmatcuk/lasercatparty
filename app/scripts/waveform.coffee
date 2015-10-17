@@ -6,7 +6,7 @@ HISTORY = 8
 class Waveform
   constructor: ->
     @canvas = document.createElement 'canvas'
-    @canvas.width = 1024
+    @canvas.width = 512
     @canvas.height = 256
 
     @context = @canvas.getContext '2d'
@@ -29,11 +29,11 @@ class Waveform
     @plane.scale.y = top
 
   updateWaveform: (waveform) ->
-    @waveforms[@waveformIdx] = new Uint8Array 1024 unless @waveforms[@waveformIdx]?
+    @waveforms[@waveformIdx] = new Uint8Array waveform.length unless @waveforms[@waveformIdx]?
     @waveforms[@waveformIdx].set waveform
     @waveformIdx = (@waveformIdx + 1) & (HISTORY - 1)
 
-    @context.clearRect 0, 0, 1024, 256
+    @context.clearRect 0, 0, @canvas.width, @canvas.height
     idx = @waveformIdx
     for i in [0...@waveforms.length]
       wave = @waveforms[idx]

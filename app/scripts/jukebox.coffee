@@ -64,9 +64,9 @@ class Jukebox
     @gain.connect @context.destination
 
     @analyser = do @context.createAnalyser
-    @analyser.fftSize = 1024
+    @analyser.fftSize = 512
     @analyser.connect @gain
-    @freqData = new Float32Array @analyser.frequencyBinCount
+    @freqData = new Uint8Array @analyser.frequencyBinCount
     @timeData = new Uint8Array @analyser.fftSize
 
     @iOS = true if @iOS is false and !@context.createMediaElementSource
@@ -194,7 +194,7 @@ class Jukebox
     @timeData
 
   getSpectrum: ->
-    @analyser.getFloatFrequencyData @freqData
+    @analyser.getByteFrequencyData @freqData
     @freqData
 
   getCurrentTime: ->

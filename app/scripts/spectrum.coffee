@@ -111,12 +111,15 @@ class SpectrumAnalyzer
     @group.scale.y = top
 
   updateSpectrum: (spectrum) ->
-    size = spectrum.length / @bars.length
+    # we're going to drop some of the highest frequencies because there isn't
+    # much "energy" up there... makes for boring visualization =)
+    # size would be spectrum.length / @bars.length = 32 otherwise
+    size = 25
     for bar, i in @bars
       sum = 0.0
       sum += spectrum[j] for j in [(size * i)...(size * (i + 1))]
-      dB = 20 * Math.log10 sum / size
-      bar.setPower(1.0 + dB / 100.0)
+      avg = sum / size
+      bar.setPower(avg / 255.0)
 
   update: (timestamp) ->
     if @animationStart? and !@paused
