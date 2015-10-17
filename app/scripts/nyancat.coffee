@@ -40,8 +40,8 @@ class NyanCat extends FlyingCat
 
     @trailGeometry = new THREE.BufferGeometry
     @trailGeometry.addAttribute 'position', new THREE.BufferAttribute trailVertices, 3
-    @trailGeometry.addAttribute 'index', new THREE.BufferAttribute trailIndexes, 1
     @trailGeometry.addAttribute 'uv', new THREE.BufferAttribute trailUvs, 2
+    @trailGeometry.setIndex new THREE.BufferAttribute trailIndexes, 1
     @trailGeometry.parameters =
       width: trailWidth
       height: trailHeight

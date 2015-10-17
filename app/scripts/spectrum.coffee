@@ -20,9 +20,6 @@ class SpectrumBar
 
     @material = new THREE.ShaderMaterial
       uniforms: @uniforms
-      attributes:
-        uvs:
-          type: 'v3'
       vertexShader: require 'shaders/spectrum_bar_vert'
       fragmentShader: require 'shaders/spectrum_bar_frag'
 
@@ -72,8 +69,8 @@ class SpectrumAnalyzer
 
     @geometry = new THREE.BufferGeometry
     @geometry.addAttribute 'position', new THREE.BufferAttribute vertices, 3
-    @geometry.addAttribute 'index', new THREE.BufferAttribute indexes, 1
     @geometry.addAttribute 'uvs', new THREE.BufferAttribute uvs, 3
+    @geometry.setIndex new THREE.BufferAttribute indexes, 1
 
     @group = new THREE.Object3D
 
