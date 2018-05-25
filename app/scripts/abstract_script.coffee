@@ -4,11 +4,11 @@ class AbstractScript
   constructor: (@registrar) ->
 
   run: (@objs) ->
-    @registrar.after 0, ->
-      objs.waveform.updateWaveform(@getWaveform())
-      objs.spectrum.updateSpectrum(@getSpectrum())
+    do (registrar = @registrar, objs = @objs) ->
+      registrar.after 0, ->
+        objs.waveform.updateWaveform(@getWaveform())
+        objs.spectrum.updateSpectrum(@getSpectrum())
 
-    do (registrar = @registrar) ->
       registrar.onceAt 0, ->
         queueNyan = (nyan) =>
           do nyan.hide

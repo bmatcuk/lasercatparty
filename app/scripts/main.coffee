@@ -200,16 +200,13 @@ begin = ->
             scene.addBackgroundObj background
             runner things[1]
 
-      if iOS
-        jukebox.loadNext().then (script) ->
-          startButton = document.getElementById 'start'
-          startButton.style.display = 'block'
-          startButton.addEventListener 'click', (e) ->
-            do e.preventDefault
-            startButton.style.display = 'none'
-            runner script
-      else
-        jukebox.loadNext().then runner
+      jukebox.loadNext().then (script) ->
+        startButton = document.getElementById 'start'
+        startButton.style.display = 'block'
+        startButton.addEventListener 'click', (e) ->
+          do e.preventDefault
+          startButton.style.display = 'none'
+          runner script
 
     catch e
       console.log e.stack

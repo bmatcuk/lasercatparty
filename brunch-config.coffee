@@ -27,7 +27,7 @@ exports.config =
     postcss:
       processors: [
         require('postcss-nested')
-        require('cssnext')({browsers: '> 5%'})
+        require('postcss-cssnext')({browsers: '> 5%'})
         require('cssnano')
       ]
 
@@ -38,3 +38,4 @@ exports.config =
       plugins: autoReload: enabled: false
       conventions: ignored: /(test|jade[\\/]runtime.js$)/
 
+  npm: enabled: false
