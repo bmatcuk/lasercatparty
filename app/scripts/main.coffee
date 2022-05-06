@@ -153,8 +153,7 @@ begin = ->
       window.addEventListener 'resize', resizeSongProgress
 
       # startup the jukebox - iOS has some issues, so we need to detect that
-      jukebox = new Jukebox iOS, songProgress, volume
-      scene.registerForUpdates jukebox
+      jukebox = null
       runner = (script) ->
         # update the ui
         do markProgress
@@ -200,12 +199,15 @@ begin = ->
             scene.addBackgroundObj background
             runner things[1]
 
-      jukebox.loadNext().then (script) ->
-        startButton = document.getElementById 'start'
-        startButton.style.display = 'block'
-        startButton.addEventListener 'click', (e) ->
-          do e.preventDefault
-          startButton.style.display = 'none'
+      startButton = document.getElementById 'start'
+      startButton.style.display = 'block'
+      startButton.addEventListener 'click', (e) ->
+        do e.preventDefault
+        startButton.style.display = 'none'
+
+        jukebox = new Jukebox iOS, songProgress, volume
+        scene.registerForUpdates jukebox
+        jukebox.loadNext().then (script) ->
           runner script
 
     catch e
